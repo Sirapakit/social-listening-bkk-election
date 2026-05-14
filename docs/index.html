@@ -4,734 +4,937 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Bangkok Election 2026 · Social Listening Dashboard</title>
-  <meta name="description" content="Real-time X.com buzz, reach & sentiment tracker for the 2026 Bangkok Governor election — comparing ชัชชาติ vs ดร.โจ ชัยวัฒน์." />
+  <meta name="description" content="Real-time X.com buzz, reach & sentiment tracker for the 2026 Bangkok Governor election." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --lime:        #8FE74F;
-      --lime-dim:    #6fba38;
-      --lime-glow:   rgba(143,231,79,0.35);
-      --dark-green:  #0F3B1F;
-      --orange:      #F26B2C;
-      --bg:          #080f0a;
-      --surface:     #0e1a11;
-      --surface-2:   #152019;
-      --surface-3:   #1c2e20;
-      --border:      rgba(143,231,79,0.12);
-      --border-2:    rgba(143,231,79,0.22);
-      --text:        #e8f5e0;
-      --muted:       #7a9e80;
-      --pos:         #4ade80;
-      --neg:         #f87171;
-      --neu:         #94a3b8;
+      --lime:       #8FE74F;
+      --lime-dim:   #6fba38;
+      --lime-glow:  rgba(143,231,79,.35);
+      --dark-green: #0F3B1F;
+      --orange:     #F26B2C;
+      --orange-glow:rgba(242,107,44,.25);
+      --bg:         #080f0a;
+      --surface:    #0e1a11;
+      --surface-2:  #152019;
+      --surface-3:  #1c2e20;
+      --border:     rgba(143,231,79,.1);
+      --border-2:   rgba(143,231,79,.2);
+      --text:       #e8f5e0;
+      --muted:      #6a8a6f;
+      --pos:        #4ade80;
+      --neg:        #f87171;
+      --neu:        #94a3b8;
     }
 
     html { scroll-behavior: smooth; }
-
     body {
-      font-family: 'Inter', 'Noto Sans Thai', sans-serif;
+      font-family: 'Inter','Noto Sans Thai',sans-serif;
       background: var(--bg);
       color: var(--text);
       line-height: 1.6;
-      min-height: 100vh;
       overflow-x: hidden;
     }
 
-    /* ── Grid noise texture ── */
+    /* ambient glow */
     body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image:
-        radial-gradient(ellipse 80% 50% at 20% 0%, rgba(143,231,79,0.06) 0%, transparent 60%),
-        radial-gradient(ellipse 60% 40% at 80% 100%, rgba(242,107,44,0.05) 0%, transparent 60%);
-      pointer-events: none;
-      z-index: 0;
+      content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+      background:
+        radial-gradient(ellipse 70% 45% at 15% 5%,  rgba(143,231,79,.07) 0%, transparent 65%),
+        radial-gradient(ellipse 50% 35% at 85% 95%, rgba(242,107,44,.05) 0%, transparent 65%);
     }
 
-    /* ── Layout ── */
-    .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+    .wrap { max-width:1100px; margin:0 auto; padding:0 24px; position:relative; z-index:1; }
 
     /* ── Nav ── */
     nav {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: rgba(8,15,10,0.85);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
+      position:sticky; top:0; z-index:100;
+      background:rgba(8,15,10,.88); backdrop-filter:blur(14px);
+      border-bottom:1px solid var(--border);
     }
     .nav-inner {
-      max-width: 1080px; margin: 0 auto; padding: 0 24px;
-      display: flex; align-items: center; gap: 16px; height: 56px;
+      max-width:1100px; margin:0 auto; padding:0 24px;
+      height:54px; display:flex; align-items:center; gap:8px;
     }
-    .nav-logo {
-      display: flex; align-items: center; gap: 10px;
-      font-weight: 700; font-size: 15px; color: var(--text); text-decoration: none;
+    .nav-brand {
+      display:flex; align-items:center; gap:9px;
+      font-weight:700; font-size:14px; color:var(--text); text-decoration:none;
     }
-    .nav-logo-icon {
-      width: 30px; height: 30px; border-radius: 8px;
-      background: linear-gradient(135deg, var(--lime), var(--lime-dim));
-      display: flex; align-items: center; justify-content: center;
-      font-size: 14px;
+    .nav-icon {
+      width:28px; height:28px; border-radius:7px; flex-shrink:0;
+      background:linear-gradient(135deg,var(--lime),var(--lime-dim));
+      display:flex; align-items:center; justify-content:center; font-size:13px;
     }
-    .nav-links { display: flex; gap: 4px; margin-left: auto; }
-    .nav-link {
-      color: var(--muted); text-decoration: none; font-size: 13px; font-weight: 500;
-      padding: 6px 12px; border-radius: 6px; transition: color .15s, background .15s;
+    .nav-links { display:flex; gap:2px; margin-left:auto; }
+    .nav-a {
+      color:var(--muted); text-decoration:none; font-size:13px; font-weight:500;
+      padding:5px 11px; border-radius:6px; transition:color .15s, background .15s;
     }
-    .nav-link:hover { color: var(--text); background: var(--surface-2); }
-    .nav-cta {
-      background: var(--lime); color: var(--dark-green); font-weight: 700;
-      padding: 6px 14px; border-radius: 8px; text-decoration: none; font-size: 13px;
-      transition: opacity .15s, transform .1s;
-      margin-left: 8px;
+    .nav-a:hover { color:var(--text); background:var(--surface-2); }
+    .nav-gh {
+      margin-left:8px; background:var(--surface-2); border:1px solid var(--border-2);
+      color:var(--text); font-size:13px; font-weight:600;
+      padding:5px 14px; border-radius:8px; text-decoration:none;
+      display:flex; align-items:center; gap:6px; transition:border-color .15s;
     }
-    .nav-cta:hover { opacity: .9; transform: scale(1.03); }
+    .nav-gh:hover { border-color:var(--lime); }
 
     /* ── Hero ── */
-    .hero {
-      padding: 96px 0 80px;
-      text-align: center;
+    .hero { padding:90px 0 60px; text-align:center; }
+    .hero-pill {
+      display:inline-flex; align-items:center; gap:7px;
+      background:color-mix(in oklab,var(--lime) 10%,transparent);
+      border:1px solid var(--border-2);
+      color:var(--lime); font-size:11px; font-weight:700;
+      padding:5px 14px; border-radius:99px; margin-bottom:22px;
+      letter-spacing:.07em; text-transform:uppercase;
     }
-    .hero-tag {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: color-mix(in oklab, var(--lime) 12%, transparent);
-      border: 1px solid var(--border-2);
-      color: var(--lime); font-size: 12px; font-weight: 600;
-      padding: 5px 14px; border-radius: 99px; margin-bottom: 24px;
-      letter-spacing: .05em; text-transform: uppercase;
-    }
-    .hero-tag-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--lime); animation: pulse 2s ease-in-out infinite; }
-    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.4; } }
+    .pill-dot { width:6px; height:6px; border-radius:50%; background:var(--lime); animation:blink 2s ease-in-out infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
 
     h1 {
-      font-size: clamp(36px, 6vw, 64px);
-      font-weight: 800;
-      line-height: 1.1;
-      letter-spacing: -.02em;
-      margin-bottom: 20px;
+      font-size:clamp(38px,6vw,68px); font-weight:800;
+      line-height:1.08; letter-spacing:-.025em; margin-bottom:18px;
     }
-    .gradient-text {
-      background: linear-gradient(135deg, var(--lime) 0%, #b8f77a 60%, var(--orange) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+    .grad {
+      background:linear-gradient(130deg,var(--lime) 0%,#b8f77a 55%,var(--orange) 100%);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
     }
     .hero-sub {
-      font-size: 18px; color: var(--muted); max-width: 560px; margin: 0 auto 36px;
-      line-height: 1.7;
+      font-size:17px; color:var(--muted); max-width:520px; margin:0 auto 36px; line-height:1.75;
     }
-    .hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-    .btn-primary {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: linear-gradient(135deg, var(--lime), var(--lime-dim));
-      color: var(--dark-green); font-weight: 700; font-size: 15px;
-      padding: 12px 24px; border-radius: 10px; text-decoration: none;
-      transition: opacity .15s, transform .1s, box-shadow .2s;
-      box-shadow: 0 0 28px -6px var(--lime-glow);
+    .hero-btns { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+    .btn-p {
+      display:inline-flex; align-items:center; gap:7px;
+      background:linear-gradient(135deg,var(--lime),var(--lime-dim));
+      color:var(--dark-green); font-weight:700; font-size:14px;
+      padding:11px 22px; border-radius:10px; text-decoration:none;
+      box-shadow:0 0 28px -6px var(--lime-glow);
+      transition:opacity .15s,transform .1s;
     }
-    .btn-primary:hover { opacity: .9; transform: translateY(-1px); box-shadow: 0 0 36px -4px var(--lime-glow); }
-    .btn-secondary {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: var(--surface-2); color: var(--text); font-weight: 600; font-size: 15px;
-      padding: 12px 24px; border-radius: 10px; text-decoration: none;
-      border: 1px solid var(--border-2); transition: background .15s, transform .1s;
+    .btn-p:hover { opacity:.9; transform:translateY(-1px); }
+    .btn-s {
+      display:inline-flex; align-items:center; gap:7px;
+      background:var(--surface-2); border:1px solid var(--border-2);
+      color:var(--text); font-weight:600; font-size:14px;
+      padding:11px 22px; border-radius:10px; text-decoration:none;
+      transition:background .15s,transform .1s;
     }
-    .btn-secondary:hover { background: var(--surface-3); transform: translateY(-1px); }
+    .btn-s:hover { background:var(--surface-3); transform:translateY(-1px); }
 
-    /* ── Stats strip ── */
-    .stats-strip {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 1px; background: var(--border); border: 1px solid var(--border);
-      border-radius: 14px; overflow: hidden; margin: 60px 0;
+    /* ── Dashboard hero screenshot ── */
+    .dash-frame {
+      margin:52px 0 80px;
+      background:var(--surface); border:1px solid var(--border-2);
+      border-radius:18px; overflow:hidden;
+      box-shadow:0 0 80px -20px var(--lime-glow), 0 40px 80px -20px rgba(0,0,0,.6);
     }
-    .stat-cell {
-      background: var(--surface); padding: 24px 20px; text-align: center;
+    .dash-bar {
+      background:var(--surface-2); border-bottom:1px solid var(--border);
+      padding:11px 16px; display:flex; align-items:center; gap:7px;
     }
-    .stat-val {
-      font-size: 28px; font-weight: 800; font-family: 'JetBrains Mono', monospace;
-      color: var(--lime); line-height: 1;
+    .dot { width:10px; height:10px; border-radius:50%; }
+    .addr {
+      margin-left:10px; background:var(--surface-3); border:1px solid var(--border);
+      border-radius:6px; padding:3px 14px;
+      font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted);
     }
-    .stat-label { font-size: 12px; color: var(--muted); margin-top: 6px; font-weight: 500; }
+    .dash-body { padding:24px; display:flex; flex-direction:column; gap:16px; }
 
-    /* ── Section titles ── */
-    .section { padding: 64px 0; }
-    .section-header { text-align: center; margin-bottom: 48px; }
-    .section-tag {
-      display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .1em;
-      text-transform: uppercase; color: var(--lime); margin-bottom: 12px;
+    /* header row */
+    .db-header {
+      display:flex; align-items:center; gap:12px; padding-bottom:12px;
+      border-bottom:1px solid var(--border);
     }
-    h2 { font-size: clamp(26px, 4vw, 38px); font-weight: 800; letter-spacing: -.01em; margin-bottom: 12px; }
-    .section-sub { color: var(--muted); font-size: 16px; max-width: 520px; margin: 0 auto; }
-
-    /* ── Feature grid ── */
-    .feature-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;
+    .db-icon {
+      width:44px; height:44px; border-radius:12px; flex-shrink:0;
+      background:linear-gradient(135deg,var(--lime),var(--lime-dim));
+      display:flex; align-items:center; justify-content:center; font-size:20px;
     }
-    .feature-card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 14px; padding: 24px; transition: border-color .2s, transform .15s;
-    }
-    .feature-card:hover { border-color: var(--border-2); transform: translateY(-2px); }
-    .feature-icon {
-      width: 40px; height: 40px; border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px; margin-bottom: 16px;
-    }
-    .feature-title { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
-    .feature-desc { font-size: 14px; color: var(--muted); line-height: 1.6; }
-
-    /* ── Architecture diagram ── */
-    .arch {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 16px; padding: 32px; margin-top: 48px;
-      font-family: 'JetBrains Mono', monospace; font-size: 13px;
-    }
-    .arch-title { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: 24px; font-family: 'Inter', sans-serif; }
-    .arch-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
-    .arch-box {
-      padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 500;
-      border: 1px solid; white-space: nowrap;
-    }
-    .arch-arrow { color: var(--muted); font-size: 16px; }
-    .box-lime   { background: color-mix(in oklab, var(--lime) 12%, transparent);  color: var(--lime);   border-color: color-mix(in oklab, var(--lime) 30%, transparent); }
-    .box-orange { background: color-mix(in oklab, var(--orange) 12%, transparent); color: var(--orange); border-color: color-mix(in oklab, var(--orange) 30%, transparent); }
-    .box-blue   { background: rgba(99,179,237,0.1); color: #63b3ed; border-color: rgba(99,179,237,0.25); }
-    .box-muted  { background: var(--surface-2); color: var(--muted); border-color: var(--border); }
-
-    /* ── Candidates ── */
-    .candidates { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    @media (max-width: 560px) { .candidates { grid-template-columns: 1fr; } }
-    .candidate-card {
-      border-radius: 14px; padding: 28px; border: 1px solid;
-      position: relative; overflow: hidden;
-    }
-    .candidate-card::before {
-      content: ''; position: absolute; inset: 0; opacity: .06;
-      background: radial-gradient(ellipse at top left, currentColor, transparent 70%);
-    }
-    .candidate-name { font-size: 22px; font-weight: 800; font-family: 'Noto Sans Thai', 'Inter', sans-serif; }
-    .candidate-handle { font-size: 12px; font-family: 'JetBrains Mono', monospace; margin-top: 4px; opacity: .7; }
-    .candidate-query {
-      margin-top: 16px; font-size: 11px; font-family: 'JetBrains Mono', monospace;
-      background: rgba(0,0,0,.25); padding: 10px 12px; border-radius: 8px;
-      line-height: 1.8; word-break: break-word;
+    .db-title { font-size:20px; font-weight:800; }
+    .db-sub { font-size:12px; color:var(--muted); }
+    .db-pill {
+      margin-left:auto; font-size:10px; font-family:'JetBrains Mono',monospace;
+      background:var(--surface-2); border:1px solid var(--border);
+      padding:4px 10px; border-radius:6px; color:var(--muted);
+      display:flex; align-items:center; gap:5px;
     }
 
-    /* ── Setup steps ── */
-    .steps { display: flex; flex-direction: column; gap: 16px; }
-    .step {
-      display: grid; grid-template-columns: 36px 1fr; gap: 16px; align-items: start;
-      background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px;
+    /* SoV bar */
+    .sov-row { display:flex; flex-direction:column; gap:6px; }
+    .sov-label { font-size:10px; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); font-weight:600; }
+    .sov-bar-bg { height:28px; background:var(--surface-3); border-radius:8px; overflow:hidden; display:flex; }
+    .sov-seg { display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; font-family:'JetBrains Mono',monospace; }
+
+    /* metrics */
+    .metrics-4 { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+    .m-tile { background:var(--surface-2); border:1px solid var(--border); border-radius:10px; padding:14px; }
+    .m-val { font-size:20px; font-weight:800; font-family:'JetBrains Mono',monospace; line-height:1; margin-bottom:4px; }
+    .m-lbl { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; }
+
+    /* coverage */
+    .cov-strip { display:flex; gap:5px; flex-wrap:wrap; }
+    .cb {
+      width:32px; height:32px; border-radius:7px; border:1px solid;
+      display:flex; align-items:center; justify-content:center;
+      font-size:10px; font-weight:700; font-family:'JetBrains Mono',monospace;
     }
-    .step-num {
-      width: 36px; height: 36px; border-radius: 50%;
-      background: color-mix(in oklab, var(--lime) 15%, transparent);
-      border: 1px solid var(--border-2); color: var(--lime);
-      font-weight: 700; font-size: 14px; font-family: 'JetBrains Mono', monospace;
-      display: flex; align-items: center; justify-content: center; shrink: 0;
+    .cb-ok  { background:rgba(74,222,128,.1); color:var(--pos); border-color:rgba(74,222,128,.3); }
+    .cb-sam { background:rgba(242,107,44,.1); color:var(--orange); border-color:rgba(242,107,44,.3); }
+    .cb-mis { background:var(--surface-2); color:var(--muted); border-color:var(--border); }
+    .cb-sel {
+      background:rgba(143,231,79,.15); color:var(--lime); border-color:var(--lime);
+      box-shadow:0 0 0 2px var(--lime),0 0 12px -2px var(--lime-glow);
     }
-    .step-title { font-weight: 700; font-size: 15px; margin-bottom: 6px; }
-    .step-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+    /* timeline bars */
+    .tl { display:flex; align-items:flex-end; gap:4px; height:60px; }
+    .tl-g { flex:1; display:flex; gap:2px; align-items:flex-end; }
+    .tl-b { flex:1; border-radius:3px 3px 0 0; min-height:4px; }
+
+    /* sentiment donut */
+    .sent-wrap { display:flex; gap:16px; align-items:center; }
+    .donut-svg { width:80px; height:80px; flex-shrink:0; }
+    .sent-bars { flex:1; display:flex; flex-direction:column; gap:6px; }
+    .sb-row { display:flex; align-items:center; gap:8px; font-size:11px; }
+    .sb-lbl { width:54px; color:var(--muted); text-align:right; flex-shrink:0; }
+    .sb-bg { flex:1; height:6px; background:var(--surface-3); border-radius:99px; overflow:hidden; }
+    .sb-fill { height:100%; border-radius:99px; }
+    .sb-pct { width:28px; font-family:'JetBrains Mono',monospace; color:var(--muted); font-size:10px; }
+
+    /* top posts */
+    .post-card { background:var(--surface-2); border:1px solid var(--border); border-radius:9px; padding:12px; margin-bottom:8px; }
+    .post-meta { display:flex; align-items:center; gap:8px; margin-bottom:7px; }
+    .post-avatar { width:26px; height:26px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; }
+    .post-handle { font-size:11px; font-weight:600; }
+    .post-date { font-size:10px; color:var(--muted); margin-left:auto; font-family:'JetBrains Mono',monospace; }
+    .post-text { font-size:12px; color:var(--muted); line-height:1.5; font-family:'Noto Sans Thai','Inter',sans-serif; }
+    .post-stats { display:flex; gap:12px; margin-top:8px; font-size:10px; color:var(--muted); font-family:'JetBrains Mono',monospace; }
+
+    /* cost tiles */
+    .cost-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+    .cost-tile { border-radius:9px; padding:12px; border:1px solid; }
+    .cost-val { font-size:18px; font-weight:800; font-family:'JetBrains Mono',monospace; }
+    .cost-lbl { font-size:10px; color:var(--muted); margin-top:3px; }
+
+    /* slider mockup */
+    .slider-wrap { display:flex; align-items:center; gap:10px; }
+    .slider-track {
+      flex:1; height:6px; border-radius:99px; position:relative;
+      background:linear-gradient(to right, var(--lime) 65%, var(--surface-3) 65%);
+    }
+    .slider-thumb {
+      position:absolute; top:50%; left:65%; transform:translate(-50%,-50%);
+      width:16px; height:16px; border-radius:50%;
+      background:white; border:2px solid var(--lime);
+      box-shadow:0 0 0 3px var(--lime-glow);
+    }
+    .slider-val { font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:600; color:var(--lime); }
+
+    /* ── Feature sections ── */
+    .features { display:flex; flex-direction:column; gap:6px; }
+
+    .feat {
+      border:1px solid var(--border); border-radius:20px;
+      overflow:hidden; background:var(--surface);
+      display:grid; grid-template-columns:1fr 1fr; align-items:center;
+    }
+    .feat.flip { direction:rtl; }
+    .feat.flip > * { direction:ltr; }
+
+    .feat-copy { padding:44px 48px; }
+    .feat-tag {
+      display:inline-block; font-size:10px; font-weight:700;
+      letter-spacing:.1em; text-transform:uppercase; color:var(--lime);
+      margin-bottom:12px;
+    }
+    .feat-tag.orange { color:var(--orange); }
+    h3 { font-size:clamp(22px,3vw,30px); font-weight:800; letter-spacing:-.015em; margin-bottom:14px; line-height:1.15; }
+    .feat-desc { font-size:15px; color:var(--muted); line-height:1.7; margin-bottom:20px; }
+    .feat-bullets { display:flex; flex-direction:column; gap:9px; }
+    .fb {
+      display:flex; align-items:flex-start; gap:10px;
+      font-size:13px; color:var(--muted); line-height:1.5;
+    }
+    .fb-dot { width:18px; height:18px; border-radius:5px; flex-shrink:0; margin-top:1px;
+      display:flex; align-items:center; justify-content:center; font-size:10px; }
+    .fb-dot.g { background:color-mix(in oklab,var(--lime) 15%,transparent); }
+    .fb-dot.o { background:color-mix(in oklab,var(--orange) 15%,transparent); }
+
+    .feat-visual {
+      background:var(--surface-2); border-left:1px solid var(--border);
+      padding:32px; display:flex; flex-direction:column; gap:14px;
+      min-height:360px; justify-content:center;
+    }
+    .feat.flip .feat-visual { border-left:none; border-right:1px solid var(--border); }
+
+    .vis-label { font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); font-weight:600; margin-bottom:6px; }
+
+    /* ── Quick setup strip ── */
+    .setup-strip {
+      margin:80px 0; display:grid; grid-template-columns:repeat(4,1fr); gap:1px;
+      background:var(--border); border:1px solid var(--border); border-radius:16px; overflow:hidden;
+    }
+    .setup-cell { background:var(--surface); padding:24px 20px; }
+    .setup-num {
+      width:28px; height:28px; border-radius:7px; margin-bottom:14px;
+      background:color-mix(in oklab,var(--lime) 14%,transparent);
+      border:1px solid var(--border-2); color:var(--lime);
+      font-size:12px; font-weight:700; font-family:'JetBrains Mono',monospace;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .setup-title { font-size:13px; font-weight:700; margin-bottom:6px; }
+    .setup-desc { font-size:12px; color:var(--muted); line-height:1.55; }
     code {
-      font-family: 'JetBrains Mono', monospace; font-size: 12px;
-      background: var(--surface-3); padding: 2px 7px; border-radius: 5px;
-      color: var(--lime); border: 1px solid var(--border);
+      font-family:'JetBrains Mono',monospace; font-size:11px;
+      background:var(--surface-3); padding:1px 5px; border-radius:4px;
+      color:var(--lime); border:1px solid var(--border);
     }
-    pre {
-      background: var(--surface-3); border: 1px solid var(--border);
-      border-radius: 10px; padding: 16px; margin-top: 10px;
-      font-family: 'JetBrains Mono', monospace; font-size: 12px;
-      overflow-x: auto; line-height: 1.8; color: var(--text);
-    }
-    pre .comment { color: var(--muted); }
-    pre .cmd { color: var(--lime); }
-
-    /* ── Metrics mockup ── */
-    .metrics-mock {
-      display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px;
-    }
-    @media (max-width: 640px) { .metrics-mock { grid-template-columns: repeat(2, 1fr); } }
-    .metric-tile {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 10px; padding: 16px;
-    }
-    .metric-val {
-      font-size: 22px; font-weight: 800; font-family: 'JetBrains Mono', monospace;
-      color: var(--text); margin-bottom: 4px;
-    }
-    .metric-lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
-
-    /* ── Sentiment bars mockup ── */
-    .sentiment-mock { display: flex; flex-direction: column; gap: 10px; }
-    .sent-row { display: flex; align-items: center; gap: 12px; }
-    .sent-label { font-size: 12px; color: var(--muted); width: 70px; text-align: right; flex-shrink: 0; }
-    .sent-bar-bg { flex: 1; height: 8px; background: var(--surface-3); border-radius: 99px; overflow: hidden; }
-    .sent-bar { height: 100%; border-radius: 99px; }
-    .sent-pct { font-size: 12px; font-family: 'JetBrains Mono', monospace; width: 36px; color: var(--muted); }
-
-    /* ── Timeline bars mockup ── */
-    .timeline-mock {
-      display: flex; align-items: flex-end; gap: 6px; height: 80px;
-      padding: 0 4px;
-    }
-    .tl-col { flex: 1; display: flex; flex-direction: column; gap: 2px; align-items: center; }
-    .tl-bar { width: 100%; border-radius: 4px 4px 0 0; }
-
-    /* ── Preview window ── */
-    .preview-window {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 16px; overflow: hidden; margin: 48px 0;
-    }
-    .preview-header {
-      background: var(--surface-2); border-bottom: 1px solid var(--border);
-      padding: 12px 16px; display: flex; align-items: center; gap: 8px;
-    }
-    .preview-dot { width: 10px; height: 10px; border-radius: 50%; }
-    .preview-url {
-      background: var(--surface-3); border: 1px solid var(--border);
-      border-radius: 6px; padding: 4px 12px; font-size: 12px;
-      font-family: 'JetBrains Mono', monospace; color: var(--muted);
-      margin-left: 12px; flex: 1; max-width: 260px;
-    }
-    .preview-body { padding: 24px; }
-
-    /* ── Coverage strip mockup ── */
-    .coverage-mock {
-      display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px;
-    }
-    .cov-badge {
-      width: 34px; height: 34px; border-radius: 7px; border: 1px solid;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 11px; font-weight: 700; font-family: 'JetBrains Mono', monospace;
-    }
-    .cov-complete { background: rgba(74,222,128,.1); color: var(--pos); border-color: rgba(74,222,128,.3); }
-    .cov-sampled  { background: rgba(242,107,44,.1); color: var(--orange); border-color: rgba(242,107,44,.3); }
-    .cov-missing  { background: var(--surface-2); color: var(--muted); border-color: var(--border); }
 
     /* ── Footer ── */
     footer {
-      border-top: 1px solid var(--border); padding: 40px 0;
-      text-align: center; color: var(--muted); font-size: 13px;
+      border-top:1px solid var(--border); padding:36px 0;
+      text-align:center; font-size:12px; color:var(--muted);
     }
-    footer a { color: var(--lime); text-decoration: none; }
-    footer a:hover { text-decoration: underline; }
-    .footer-links { display: flex; gap: 24px; justify-content: center; margin-bottom: 16px; flex-wrap: wrap; }
+    footer a { color:var(--lime); text-decoration:none; }
+    footer a:hover { text-decoration:underline; }
+    .footer-row { display:flex; gap:20px; justify-content:center; margin-bottom:12px; flex-wrap:wrap; }
 
     /* ── Responsive ── */
-    @media (max-width: 640px) {
-      .hero { padding: 64px 0 48px; }
-      .arch-row { flex-direction: column; align-items: flex-start; }
-      .arch-arrow { transform: rotate(90deg); }
+    @media (max-width:768px) {
+      .feat { grid-template-columns:1fr; }
+      .feat.flip { direction:ltr; }
+      .feat-visual { border-left:none; border-top:1px solid var(--border); min-height:auto; }
+      .feat.flip .feat-visual { border-right:none; border-top:1px solid var(--border); }
+      .feat-copy { padding:28px 24px; }
+      .metrics-4 { grid-template-columns:repeat(2,1fr); }
+      .cost-grid { grid-template-columns:1fr 1fr; }
+      .setup-strip { grid-template-columns:1fr 1fr; }
+      .dash-body { padding:16px; }
     }
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    @media (max-width:500px) {
+      .setup-strip { grid-template-columns:1fr; }
+      .cost-grid { grid-template-columns:1fr; }
+    }
+    @media (prefers-reduced-motion:reduce) {
+      *,*::before,*::after { animation-duration:.01ms !important; transition-duration:.01ms !important; }
     }
   </style>
 </head>
 <body>
 
-<!-- ── Nav ── -->
+<!-- ══ NAV ══ -->
 <nav>
   <div class="nav-inner">
-    <a href="#" class="nav-logo">
-      <div class="nav-logo-icon">📊</div>
-      BKK Election
+    <a href="#" class="nav-brand">
+      <div class="nav-icon">📊</div>
+      Bangkok Election 2026
     </a>
     <div class="nav-links">
-      <a href="#features" class="nav-link">Features</a>
-      <a href="#setup" class="nav-link">Setup</a>
-      <a href="#architecture" class="nav-link">Architecture</a>
-      <a href="https://github.com/Sirapakit/social-listening-bkk-election" class="nav-cta" target="_blank" rel="noopener">
-        GitHub ↗
-      </a>
+      <a href="#coverage"   class="nav-a">Coverage</a>
+      <a href="#sentiment"  class="nav-a">Sentiment</a>
+      <a href="#timeline"   class="nav-a">Timeline</a>
+      <a href="#cost"       class="nav-a">Cost</a>
     </div>
+    <a href="https://github.com/Sirapakit/social-listening-bkk-election" class="nav-gh" target="_blank" rel="noopener">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.745 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+      GitHub
+    </a>
   </div>
 </nav>
 
-<!-- ── Hero ── -->
+<!-- ══ HERO ══ -->
 <div class="wrap">
-  <section class="hero">
-    <div class="hero-tag">
-      <span class="hero-tag-dot"></span>
-      Bangkok Governor Election 2026
+<section class="hero">
+  <div class="hero-pill"><span class="pill-dot"></span>Bangkok Governor Election 2026</div>
+  <h1>Track candidate buzz<br>on <span class="grad">X.com</span> in real time</h1>
+  <p class="hero-sub">
+    Day-by-day scraping · Thai sentiment analysis · Cost-controlled · SQLite-backed.
+    Compare ชัชชาติ vs ดร.โจ with one dashboard.
+  </p>
+  <div class="hero-btns">
+    <a href="https://github.com/Sirapakit/social-listening-bkk-election" class="btn-p" target="_blank" rel="noopener">⭐ View on GitHub</a>
+    <a href="#coverage" class="btn-s">See features ↓</a>
+  </div>
+</section>
+
+<!-- ══ FULL DASHBOARD MOCKUP ══ -->
+<div class="dash-frame">
+  <div class="dash-bar">
+    <div class="dot" style="background:#f87171"></div>
+    <div class="dot" style="background:#fbbf24"></div>
+    <div class="dot" style="background:var(--pos)"></div>
+    <div class="addr">localhost:3000 — Bangkok Election: Social Listening</div>
+  </div>
+  <div class="dash-body">
+
+    <!-- Header row -->
+    <div class="db-header">
+      <div class="db-icon">📊</div>
+      <div>
+        <div class="db-title">Bangkok <span style="background:linear-gradient(130deg,var(--lime),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Election</span>: Social Listening</div>
+        <div class="db-sub">2026 · X.com buzz, reach &amp; sentiment</div>
+      </div>
+      <div class="db-pill">
+        <span style="width:6px;height:6px;border-radius:50%;background:var(--lime);display:inline-block;animation:blink 2s ease-in-out infinite"></span>
+        Loaded 12:01:44
+      </div>
     </div>
-    <h1>
-      X.com <span class="gradient-text">Social Listening</span><br />Dashboard
-    </h1>
-    <p class="hero-sub">
-      Real-time buzz, reach &amp; sentiment tracking for Bangkok's 2026 gubernatorial race
-      — powered by Apify, FastAPI, SQLite &amp; Next.js.
+
+    <!-- Share of voice -->
+    <div>
+      <div class="vis-label">Share of Voice</div>
+      <div class="sov-bar-bg" style="height:32px">
+        <div class="sov-seg" style="width:63%;background:linear-gradient(90deg,#0F3B1F,#1a5c2e);color:#8FE74F">ชัชชาติ 63%</div>
+        <div class="sov-seg" style="width:37%;background:linear-gradient(90deg,#7a2e0a,#a33d0e);color:#F26B2C">ดร.โจ 37%</div>
+      </div>
+    </div>
+
+    <!-- 2-col: metrics + coverage -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div>
+        <div class="vis-label">ชัชชาติ — Key metrics</div>
+        <div class="metrics-4" style="grid-template-columns:repeat(2,1fr)">
+          <div class="m-tile">
+            <div class="m-val" style="color:var(--lime)">12,847</div>
+            <div class="m-lbl">Tweets</div>
+          </div>
+          <div class="m-tile">
+            <div class="m-val">4.2M</div>
+            <div class="m-lbl">Reach</div>
+          </div>
+          <div class="m-tile">
+            <div class="m-val">89K</div>
+            <div class="m-lbl">Engagement</div>
+          </div>
+          <div class="m-tile">
+            <div class="m-val">18M</div>
+            <div class="m-lbl">Views</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="vis-label">Coverage — May 2026</div>
+        <div class="cov-strip">
+          <div class="cb cb-ok">01</div><div class="cb cb-ok">02</div>
+          <div class="cb cb-ok">03</div><div class="cb cb-sam">04</div>
+          <div class="cb cb-ok">05</div><div class="cb cb-ok">06</div>
+          <div class="cb cb-ok">07</div><div class="cb cb-ok">08</div>
+          <div class="cb cb-sam">09</div><div class="cb cb-ok">10</div>
+          <div class="cb cb-sel">11</div><div class="cb cb-ok">12</div>
+          <div class="cb cb-ok">13</div><div class="cb cb-ok">14</div>
+          <div class="cb cb-mis">15</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sentiment + Timeline -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div>
+        <div class="vis-label">Sentiment breakdown — ชัชชาติ</div>
+        <div class="sent-wrap">
+          <svg class="donut-svg" viewBox="0 0 80 80">
+            <circle cx="40" cy="40" r="28" fill="none" stroke="var(--surface-3)" stroke-width="12"/>
+            <circle cx="40" cy="40" r="28" fill="none" stroke="var(--pos)" stroke-width="12"
+              stroke-dasharray="109 67" stroke-dashoffset="0" transform="rotate(-90 40 40)"/>
+            <circle cx="40" cy="40" r="28" fill="none" stroke="var(--neu)" stroke-width="12"
+              stroke-dasharray="50 126" stroke-dashoffset="-109" transform="rotate(-90 40 40)"/>
+            <circle cx="40" cy="40" r="28" fill="none" stroke="var(--neg)" stroke-width="12"
+              stroke-dasharray="17 159" stroke-dashoffset="-159" transform="rotate(-90 40 40)"/>
+            <text x="40" y="44" text-anchor="middle" fill="var(--lime)" font-size="11" font-weight="800" font-family="JetBrains Mono,monospace">62%</text>
+          </svg>
+          <div class="sent-bars">
+            <div class="sb-row">
+              <div class="sb-lbl">Positive</div>
+              <div class="sb-bg"><div class="sb-fill" style="width:62%;background:var(--pos)"></div></div>
+              <div class="sb-pct">62%</div>
+            </div>
+            <div class="sb-row">
+              <div class="sb-lbl">Neutral</div>
+              <div class="sb-bg"><div class="sb-fill" style="width:28%;background:var(--neu)"></div></div>
+              <div class="sb-pct">28%</div>
+            </div>
+            <div class="sb-row">
+              <div class="sb-lbl">Negative</div>
+              <div class="sb-bg"><div class="sb-fill" style="width:10%;background:var(--neg)"></div></div>
+              <div class="sb-pct">10%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="vis-label">Daily buzz — 7 days</div>
+        <div class="tl">
+          <div class="tl-g">
+            <div class="tl-b" style="height:52%;background:color-mix(in oklab,var(--lime) 55%,transparent)"></div>
+            <div class="tl-b" style="height:35%;background:color-mix(in oklab,var(--orange) 55%,transparent)"></div>
+          </div>
+          <div class="tl-g">
+            <div class="tl-b" style="height:68%;background:color-mix(in oklab,var(--lime) 55%,transparent)"></div>
+            <div class="tl-b" style="height:42%;background:color-mix(in oklab,var(--orange) 55%,transparent)"></div>
+          </div>
+          <div class="tl-g">
+            <div class="tl-b" style="height:45%;background:color-mix(in oklab,var(--lime) 55%,transparent)"></div>
+            <div class="tl-b" style="height:58%;background:color-mix(in oklab,var(--orange) 55%,transparent)"></div>
+          </div>
+          <div class="tl-g">
+            <div class="tl-b" style="height:90%;background:var(--lime)"></div>
+            <div class="tl-b" style="height:55%;background:color-mix(in oklab,var(--orange) 70%,transparent)"></div>
+          </div>
+          <div class="tl-g">
+            <div class="tl-b" style="height:72%;background:color-mix(in oklab,var(--lime) 55%,transparent)"></div>
+            <div class="tl-b" style="height:60%;background:color-mix(in oklab,var(--orange) 55%,transparent)"></div>
+          </div>
+          <div class="tl-g">
+            <div class="tl-b" style="height:58%;background:color-mix(in oklab,var(--lime) 55%,transparent)"></div>
+            <div class="tl-b" style="height:80%;background:var(--orange)"></div>
+          </div>
+          <div class="tl-g">
+            <div class="tl-b" style="height:65%;background:color-mix(in oklab,var(--lime) 55%,transparent)"></div>
+            <div class="tl-b" style="height:48%;background:color-mix(in oklab,var(--orange) 55%,transparent)"></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;margin-top:8px;font-size:10px;color:var(--muted)">
+          <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:var(--lime);display:inline-block"></span>ชัชชาติ</span>
+          <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:var(--orange);display:inline-block"></span>ดร.โจ</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+<!-- end dash-frame -->
+
+<!-- ══════════════════════════════════════════
+     FEATURE 1 — COVERAGE CALENDAR
+══════════════════════════════════════════ -->
+<div class="features">
+
+<section class="feat" id="coverage">
+  <div class="feat-copy">
+    <div class="feat-tag">Coverage Calendar</div>
+    <h3>Know exactly which days have data</h3>
+    <p class="feat-desc">
+      Every scraped day gets a numbered badge. At a glance you can see which
+      days are fully covered, which hit the cap (sampled), and which are missing
+      — without reading a single number.
     </p>
-    <div class="hero-actions">
-      <a href="https://github.com/Sirapakit/social-listening-bkk-election" class="btn-primary" target="_blank" rel="noopener">
-        ⭐ View on GitHub
-      </a>
-      <a href="#setup" class="btn-secondary">
-        🚀 Quick Setup
-      </a>
-    </div>
-  </section>
-
-  <!-- ── Stats ── -->
-  <div class="stats-strip">
-    <div class="stat-cell">
-      <div class="stat-val">2</div>
-      <div class="stat-label">Candidates tracked</div>
-    </div>
-    <div class="stat-cell">
-      <div class="stat-val">$0.00025</div>
-      <div class="stat-label">Per tweet scraped</div>
-    </div>
-    <div class="stat-cell">
-      <div class="stat-val">2,000</div>
-      <div class="stat-label">Max tweets / day</div>
-    </div>
-    <div class="stat-cell">
-      <div class="stat-val">SQLite</div>
-      <div class="stat-label">Zero-setup persistence</div>
-    </div>
-    <div class="stat-cell">
-      <div class="stat-val">12:00</div>
-      <div class="stat-label">Daily auto-scrape</div>
-    </div>
-  </div>
-
-  <!-- ── UI Preview ── -->
-  <div class="preview-window">
-    <div class="preview-header">
-      <div class="preview-dot" style="background:#f87171"></div>
-      <div class="preview-dot" style="background:#fbbf24"></div>
-      <div class="preview-dot" style="background:var(--pos)"></div>
-      <div class="preview-url">localhost:3000</div>
-    </div>
-    <div class="preview-body">
-      <!-- Metrics row -->
-      <p style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:12px;font-weight:600;">ชัชชาติ — Metrics</p>
-      <div class="metrics-mock">
-        <div class="metric-tile">
-          <div class="metric-val" style="color:var(--lime)">12,847</div>
-          <div class="metric-lbl">Buzz (tweets)</div>
-        </div>
-        <div class="metric-tile">
-          <div class="metric-val">4.2M</div>
-          <div class="metric-lbl">Reach</div>
-        </div>
-        <div class="metric-tile">
-          <div class="metric-val">89K</div>
-          <div class="metric-lbl">Engagement</div>
-        </div>
-        <div class="metric-tile">
-          <div class="metric-val">18M</div>
-          <div class="metric-lbl">Views</div>
-        </div>
+    <div class="feat-bullets">
+      <div class="fb">
+        <div class="fb-dot g" style="color:var(--pos)">●</div>
+        <span><strong style="color:var(--pos)">Green</strong> — day fully scraped (under cap)</span>
       </div>
-
-      <!-- Coverage strip -->
-      <p style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px;font-weight:600;">Coverage — May 2026</p>
-      <div class="coverage-mock">
-        <div class="cov-badge cov-complete">01</div>
-        <div class="cov-badge cov-complete">02</div>
-        <div class="cov-badge cov-complete">03</div>
-        <div class="cov-badge cov-sampled">04</div>
-        <div class="cov-badge cov-complete">05</div>
-        <div class="cov-badge cov-complete">06</div>
-        <div class="cov-badge cov-complete">07</div>
-        <div class="cov-badge cov-complete">08</div>
-        <div class="cov-badge cov-sampled">09</div>
-        <div class="cov-badge cov-complete">10</div>
-        <div class="cov-badge cov-complete">11</div>
-        <div class="cov-badge cov-complete">12</div>
-        <div class="cov-badge cov-missing">13</div>
-        <div class="cov-badge cov-missing">14</div>
-        <div class="cov-badge cov-missing">15</div>
+      <div class="fb">
+        <div class="fb-dot o" style="color:var(--orange)">▲</div>
+        <span><strong style="color:var(--orange)">Orange</strong> — hit the tweet cap; deep-scrape available</span>
       </div>
-
-      <!-- Sentiment bars -->
-      <p style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:16px 0 10px;font-weight:600;">Sentiment breakdown</p>
-      <div class="sentiment-mock">
-        <div class="sent-row">
-          <div class="sent-label">Positive</div>
-          <div class="sent-bar-bg"><div class="sent-bar" style="width:62%;background:var(--pos)"></div></div>
-          <div class="sent-pct">62%</div>
-        </div>
-        <div class="sent-row">
-          <div class="sent-label">Neutral</div>
-          <div class="sent-bar-bg"><div class="sent-bar" style="width:28%;background:var(--neu)"></div></div>
-          <div class="sent-pct">28%</div>
-        </div>
-        <div class="sent-row">
-          <div class="sent-label">Negative</div>
-          <div class="sent-bar-bg"><div class="sent-bar" style="width:10%;background:var(--neg)"></div></div>
-          <div class="sent-pct">10%</div>
-        </div>
+      <div class="fb">
+        <div class="fb-dot g" style="color:var(--muted)">○</div>
+        <span><strong style="color:var(--muted)">Grey</strong> — no data yet; click Backfill to fill</span>
       </div>
-
-      <!-- Buzz timeline bars -->
-      <p style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:16px 0 10px;font-weight:600;">Daily buzz timeline</p>
-      <div class="timeline-mock">
-        <div class="tl-col"><div class="tl-bar" style="height:45%;background:color-mix(in oklab,var(--lime) 60%,transparent)"></div></div>
-        <div class="tl-col"><div class="tl-bar" style="height:60%;background:color-mix(in oklab,var(--lime) 60%,transparent)"></div></div>
-        <div class="tl-col"><div class="tl-bar" style="height:40%;background:color-mix(in oklab,var(--lime) 60%,transparent)"></div></div>
-        <div class="tl-col"><div class="tl-bar" style="height:75%;background:color-mix(in oklab,var(--lime) 60%,transparent)"></div></div>
-        <div class="tl-col"><div class="tl-bar" style="height:55%;background:color-mix(in oklab,var(--lime) 60%,transparent)"></div></div>
-        <div class="tl-col"><div class="tl-bar" style="height:90%;background:var(--lime)"></div></div>
-        <div class="tl-col"><div class="tl-bar" style="height:70%;background:color-mix(in oklab,var(--lime) 60%,transparent)"></div></div>
-        <div class="tl-col"><div class="tl-bar" style="height:50%;background:color-mix(in oklab,var(--lime) 60%,transparent)"></div></div>
-        <div class="tl-col"><div class="tl-bar" style="height:65%;background:color-mix(in oklab,var(--lime) 60%,transparent)"></div></div>
-        <div class="tl-col"><div class="tl-bar" style="height:48%;background:color-mix(in oklab,var(--lime) 60%,transparent)"></div></div>
-        <div class="tl-col"><div class="tl-bar" style="height:80%;background:color-mix(in oklab,var(--lime) 60%,transparent)"></div></div>
-        <div class="tl-col"><div class="tl-bar" style="height:35%;background:color-mix(in oklab,var(--lime) 60%,transparent)"></div></div>
+      <div class="fb">
+        <div class="fb-dot g" style="color:var(--lime)">◉</div>
+        <span><strong style="color:var(--lime)">Lime ring</strong> — selected; detail panel shown below</span>
       </div>
     </div>
   </div>
+  <div class="feat-visual">
+    <div class="vis-label">ชัชชาติ · May 2026</div>
+    <div class="cov-strip" style="gap:6px">
+      <div class="cb cb-ok">01</div><div class="cb cb-ok">02</div><div class="cb cb-ok">03</div>
+      <div class="cb cb-sam">04</div><div class="cb cb-ok">05</div><div class="cb cb-ok">06</div>
+      <div class="cb cb-ok">07</div><div class="cb cb-ok">08</div><div class="cb cb-sam">09</div>
+      <div class="cb cb-ok">10</div><div class="cb cb-sel">11</div><div class="cb cb-ok">12</div>
+      <div class="cb cb-ok">13</div><div class="cb cb-ok">14</div><div class="cb cb-mis">15</div>
+    </div>
+    <!-- Detail panel for day 11 -->
+    <div style="margin-top:12px;background:var(--surface);border:1px solid var(--lime);border-radius:10px;padding:14px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <span style="font-size:11px;font-weight:700;color:var(--lime)">May 11</span>
+        <span style="font-size:10px;background:rgba(74,222,128,.1);color:var(--pos);border:1px solid rgba(74,222,128,.25);border-radius:5px;padding:2px 7px">complete</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-family:'JetBrains Mono',monospace">
+        <div style="font-size:10px;color:var(--muted)">Tweets<br><span style="font-size:15px;font-weight:700;color:var(--text)">1,204</span></div>
+        <div style="font-size:10px;color:var(--muted)">Cost<br><span style="font-size:15px;font-weight:700;color:var(--lime)">$0.30</span></div>
+        <div style="font-size:10px;color:var(--muted)">Hit cap?<br><span style="font-size:15px;font-weight:700;color:var(--pos)">No</span></div>
+      </div>
+    </div>
+    <!-- Deep-scrape prompt for sampled day -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <span style="font-size:11px;font-weight:700;color:var(--orange)">May 04</span>
+        <span style="font-size:10px;background:rgba(242,107,44,.1);color:var(--orange);border:1px solid rgba(242,107,44,.25);border-radius:5px;padding:2px 7px">sampled · hit cap</span>
+      </div>
+      <button style="width:100%;background:linear-gradient(135deg,var(--orange),#c9511a);color:white;border:none;border-radius:7px;padding:8px;font-size:12px;font-weight:700;cursor:pointer">
+        ⚡ Deep-scrape this day (hourly slices)
+      </button>
+    </div>
+  </div>
+</section>
 
-  <!-- ── Features ── -->
-  <section class="section" id="features">
-    <div class="section-header">
-      <div class="section-tag">Features</div>
-      <h2>Everything you need to track candidate buzz</h2>
-      <p class="section-sub">From raw tweets to actionable sentiment — fully automated, cost-transparent.</p>
-    </div>
-    <div class="feature-grid">
-      <div class="feature-card">
-        <div class="feature-icon" style="background:color-mix(in oklab,var(--lime) 14%,transparent)">🔍</div>
-        <div class="feature-title">Day-by-day idempotent scraping</div>
-        <div class="feature-desc">Scrapes each day independently. Already-covered days are skipped automatically — re-running backfill never charges you twice.</div>
+<!-- ══════════════════════════════════════════
+     FEATURE 2 — SENTIMENT ANALYSIS
+══════════════════════════════════════════ -->
+<section class="feat flip" id="sentiment">
+  <div class="feat-copy">
+    <div class="feat-tag">Thai Sentiment Analysis</div>
+    <h3>Positive, neutral, negative — in Thai</h3>
+    <p class="feat-desc">
+      A custom lexicon classifier built on PyThaiNLP tokenizer understands
+      Thai political vocabulary, negation, intensifiers, and emoji — with no
+      GPU or heavy ML dependency required.
+    </p>
+    <div class="feat-bullets">
+      <div class="fb">
+        <div class="fb-dot g">🧠</div>
+        <span>~150-word Thai + English political lexicon</span>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon" style="background:color-mix(in oklab,var(--lime) 14%,transparent)">💰</div>
-        <div class="feature-title">Real-time cost preview</div>
-        <div class="feature-desc">Adjust the tweet cap with a slider and instantly see the realistic &amp; maximum cost before pressing any button.</div>
+      <div class="fb">
+        <div class="fb-dot g">🔄</div>
+        <span>Negation flips polarity: <em style="color:var(--text)">ไม่ดี</em> → negative</span>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon" style="background:color-mix(in oklab,var(--orange) 14%,transparent)">📅</div>
-        <div class="feature-title">Coverage calendar</div>
-        <div class="feature-desc">Day-numbered badges show at a glance which days are complete, sampled (hit cap), or missing. One click to deep-scrape any day.</div>
+      <div class="fb">
+        <div class="fb-dot g">⚡</div>
+        <span>LRU-cached · 4096 entries · sub-millisecond per tweet</span>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon" style="background:color-mix(in oklab,var(--lime) 14%,transparent)">🤖</div>
-        <div class="feature-title">Thai + English sentiment</div>
-        <div class="feature-desc">Custom lexicon classifier built on PyThaiNLP tokenizer with negation detection, intensifiers, and emoji weights — no PyTorch required.</div>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon" style="background:color-mix(in oklab,var(--lime) 14%,transparent)">⏰</div>
-        <div class="feature-title">Daily auto-scrape</div>
-        <div class="feature-desc">APScheduler runs at configurable noon time every day. Zero manual effort once configured — the dashboard stays fresh automatically.</div>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon" style="background:color-mix(in oklab,var(--orange) 14%,transparent)">⚡</div>
-        <div class="feature-title">Fast local reads</div>
-        <div class="feature-desc">All chart data served from SQLite — no Apify call on page load. Dashboard opens in &lt;100ms even with months of history.</div>
+      <div class="fb">
+        <div class="fb-dot g">😊</div>
+        <span>Emoji weights: 👍❤️ positive · 👎😡 negative</span>
       </div>
     </div>
-  </section>
-
-  <!-- ── Candidates ── -->
-  <section class="section" id="candidates">
-    <div class="section-header">
-      <div class="section-tag">Candidates</div>
-      <h2>Tracked out of the box</h2>
-      <p class="section-sub">Query strings are editable in the UI — add any candidate or keyword at runtime.</p>
-    </div>
-    <div class="candidates">
-      <div class="candidate-card" style="border-color:rgba(15,59,31,.8);color:#0F3B1F;background:linear-gradient(135deg,#0e2615,#0a1c0e)">
-        <div style="color:#8FE74F;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">Candidate A</div>
-        <div class="candidate-name" style="color:#c8f0a0">ชัชชาติ สิทธิพันธุ์</div>
-        <div class="candidate-handle" style="color:#6fba38">@chadchart_trip</div>
-        <div class="candidate-query" style="color:#a8d870">ชัชชาติ OR "ชัชชาติ สิทธิพันธุ์"<br/>OR @chadchart_trip OR #ชัชชาติ</div>
-      </div>
-      <div class="candidate-card" style="border-color:rgba(242,107,44,.3);background:linear-gradient(135deg,#1e1208,#17100a)">
-        <div style="color:var(--orange);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">Candidate B</div>
-        <div class="candidate-name" style="color:#fbd0b0">ดร.โจ ชัยวัฒน์</div>
-        <div class="candidate-handle" style="color:var(--orange)">@ChaiwatPublic</div>
-        <div class="candidate-query" style="color:#e8a880">"ดร.โจ" OR "ชัยวัฒน์ สถาวรวิจิตร"<br/>OR @ChaiwatPublic OR #ดรโจ</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── Architecture ── -->
-  <section class="section" id="architecture">
-    <div class="section-header">
-      <div class="section-tag">Architecture</div>
-      <h2>How it works</h2>
-      <p class="section-sub">A simple three-layer stack — all running locally, no cloud required.</p>
-    </div>
-    <div class="arch">
-      <div class="arch-title">Data flow</div>
-      <div class="arch-row">
-        <div class="arch-box box-blue">X.com / Twitter</div>
-        <div class="arch-arrow">→</div>
-        <div class="arch-box box-orange">Apify<br><small>kaitoeasyapi actor</small></div>
-        <div class="arch-arrow">→</div>
-        <div class="arch-box box-lime">FastAPI scraper<br><small>backfill / scheduler</small></div>
-        <div class="arch-arrow">→</div>
-        <div class="arch-box box-muted">SQLite<br><small>tweets + scrape_log</small></div>
-      </div>
-      <div class="arch-row" style="margin-top:16px">
-        <div class="arch-box box-muted">SQLite</div>
-        <div class="arch-arrow">→</div>
-        <div class="arch-box box-lime">FastAPI aggregator<br><small>sentiment + metrics</small></div>
-        <div class="arch-arrow">→</div>
-        <div class="arch-box box-blue">Next.js 16<br><small>localhost:3000</small></div>
-      </div>
-    </div>
-
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:16px">
-      <div class="feature-card" style="padding:16px">
-        <div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px">Backend</div>
-        <div style="font-size:13px;line-height:2;font-family:'JetBrains Mono',monospace;color:var(--muted)">
-          <span style="color:var(--lime)">FastAPI</span> · Python 3.12<br>
-          <span style="color:var(--lime)">aiosqlite</span> · WAL mode<br>
-          <span style="color:var(--lime)">APScheduler</span> 3.x<br>
-          <span style="color:var(--lime)">PyThaiNLP</span> tokenizer<br>
-          <span style="color:var(--lime)">httpx</span> async HTTP
+  </div>
+  <div class="feat-visual">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <!-- Chadchart donut -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px">
+        <div class="vis-label">ชัชชาติ</div>
+        <div class="sent-wrap" style="gap:10px">
+          <svg viewBox="0 0 80 80" style="width:70px;height:70px;flex-shrink:0">
+            <circle cx="40" cy="40" r="28" fill="none" stroke="var(--surface-3)" stroke-width="12"/>
+            <circle cx="40" cy="40" r="28" fill="none" stroke="var(--pos)" stroke-width="12"
+              stroke-dasharray="109 67" stroke-dashoffset="0" transform="rotate(-90 40 40)"/>
+            <circle cx="40" cy="40" r="28" fill="none" stroke="var(--neu)" stroke-width="12"
+              stroke-dasharray="50 126" stroke-dashoffset="-109" transform="rotate(-90 40 40)"/>
+            <circle cx="40" cy="40" r="28" fill="none" stroke="var(--neg)" stroke-width="12"
+              stroke-dasharray="17 159" stroke-dashoffset="-159" transform="rotate(-90 40 40)"/>
+            <text x="40" y="44" text-anchor="middle" fill="var(--pos)" font-size="11" font-weight="800" font-family="JetBrains Mono,monospace">62%</text>
+          </svg>
+          <div style="flex:1">
+            <div style="font-size:10px;color:var(--pos);margin-bottom:3px">● Positive 62%</div>
+            <div style="font-size:10px;color:var(--neu);margin-bottom:3px">● Neutral 28%</div>
+            <div style="font-size:10px;color:var(--neg)">● Negative 10%</div>
+          </div>
         </div>
       </div>
-      <div class="feature-card" style="padding:16px">
-        <div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px">Frontend</div>
-        <div style="font-size:13px;line-height:2;font-family:'JetBrains Mono',monospace;color:var(--muted)">
-          <span style="color:var(--lime)">Next.js 16</span> App Router<br>
-          <span style="color:var(--lime)">Tailwind CSS v4</span><br>
-          <span style="color:var(--lime)">Recharts</span> · charts<br>
-          <span style="color:var(--lime)">Lucide</span> · icons<br>
-          <span style="color:var(--lime)">JetBrains Mono</span> · Noto Thai
-        </div>
-      </div>
-      <div class="feature-card" style="padding:16px">
-        <div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px">Data source</div>
-        <div style="font-size:13px;line-height:2;font-family:'JetBrains Mono',monospace;color:var(--muted)">
-          <span style="color:var(--orange)">Apify</span> cloud scraper<br>
-          kaitoeasyapi actor<br>
-          <span style="color:var(--orange)">$0.00025</span> / tweet<br>
-          Pay-per-result<br>
-          No rate limits
+      <!-- DrJoe donut -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px">
+        <div class="vis-label">ดร.โจ</div>
+        <div class="sent-wrap" style="gap:10px">
+          <svg viewBox="0 0 80 80" style="width:70px;height:70px;flex-shrink:0">
+            <circle cx="40" cy="40" r="28" fill="none" stroke="var(--surface-3)" stroke-width="12"/>
+            <circle cx="40" cy="40" r="28" fill="none" stroke="var(--pos)" stroke-width="12"
+              stroke-dasharray="79 97" stroke-dashoffset="0" transform="rotate(-90 40 40)"/>
+            <circle cx="40" cy="40" r="28" fill="none" stroke="var(--neu)" stroke-width="12"
+              stroke-dasharray="63 113" stroke-dashoffset="-79" transform="rotate(-90 40 40)"/>
+            <circle cx="40" cy="40" r="28" fill="none" stroke="var(--neg)" stroke-width="12"
+              stroke-dasharray="34 142" stroke-dashoffset="-142" transform="rotate(-90 40 40)"/>
+            <text x="40" y="44" text-anchor="middle" fill="var(--pos)" font-size="11" font-weight="800" font-family="JetBrains Mono,monospace">45%</text>
+          </svg>
+          <div style="flex:1">
+            <div style="font-size:10px;color:var(--pos);margin-bottom:3px">● Positive 45%</div>
+            <div style="font-size:10px;color:var(--neu);margin-bottom:3px">● Neutral 36%</div>
+            <div style="font-size:10px;color:var(--neg)">● Negative 19%</div>
+          </div>
         </div>
       </div>
     </div>
-  </section>
-
-  <!-- ── Setup ── -->
-  <section class="section" id="setup">
-    <div class="section-header">
-      <div class="section-tag">Quick Setup</div>
-      <h2>Running in under 5 minutes</h2>
-      <p class="section-sub">You'll need a free <a href="https://apify.com" style="color:var(--lime)">Apify account</a> ($5 free credit) and Python 3.12+.</p>
+    <!-- Sample classified tweet -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px">
+      <div class="vis-label">Sample classification</div>
+      <div style="font-size:13px;font-family:'Noto Sans Thai','Inter',sans-serif;color:var(--text);line-height:1.6;margin-bottom:10px">
+        "ชัชชาติทำงานเก่งมากเลย ชอบผู้ว่าคนนี้มาก ❤️"
+      </div>
+      <div style="display:flex;gap:8px;font-size:11px;font-family:'JetBrains Mono',monospace">
+        <span style="background:rgba(74,222,128,.12);color:var(--pos);border:1px solid rgba(74,222,128,.25);border-radius:5px;padding:3px 8px">✓ Positive</span>
+        <span style="color:var(--muted)">เก่งมาก +1.4 · ชอบ +1.0 · ❤️ +1.0</span>
+      </div>
     </div>
-    <div class="steps">
-      <div class="step">
-        <div class="step-num">1</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     FEATURE 3 — BUZZ TIMELINE
+══════════════════════════════════════════ -->
+<section class="feat" id="timeline">
+  <div class="feat-copy">
+    <div class="feat-tag">Daily Buzz Timeline</div>
+    <h3>See who trended on which day</h3>
+    <p class="feat-desc">
+      Stacked bar chart shows daily tweet volume per candidate side-by-side.
+      Spot news spikes, debate days, and momentum shifts instantly across
+      your selected date window.
+    </p>
+    <div class="feat-bullets">
+      <div class="fb">
+        <div class="fb-dot g">📈</div>
+        <span>Recharts bar chart — animated on load</span>
+      </div>
+      <div class="fb">
+        <div class="fb-dot g">🔍</div>
+        <span>Hover tooltip shows exact count per candidate per day</span>
+      </div>
+      <div class="fb">
+        <div class="fb-dot g">⚡</div>
+        <span>Served from SQLite — loads in &lt;100ms, no Apify call</span>
+      </div>
+      <div class="fb">
+        <div class="fb-dot g">📅</div>
+        <span>Date range adjustable in the controls bar above</span>
+      </div>
+    </div>
+  </div>
+  <div class="feat-visual">
+    <div class="vis-label">Tweet volume — May 1–14, 2026</div>
+    <!-- Bigger timeline mockup -->
+    <div style="display:flex;align-items:flex-end;gap:5px;height:130px;padding:0 2px">
+      <!-- each group = one day, two bars -->
+      <div style="flex:1;display:flex;gap:2px;align-items:flex-end;flex-direction:column;align-items:center">
+        <div style="width:100%;display:flex;gap:2px;align-items:flex-end;height:100%">
+          <div style="flex:1;border-radius:3px 3px 0 0;background:color-mix(in oklab,var(--lime) 60%,transparent);height:48%"></div>
+          <div style="flex:1;border-radius:3px 3px 0 0;background:color-mix(in oklab,var(--orange) 60%,transparent);height:30%"></div>
+        </div>
+        <div style="font-size:8px;color:var(--muted);margin-top:4px;font-family:'JetBrains Mono',monospace">01</div>
+      </div>
+      <div style="flex:1;display:flex;gap:2px;align-items:flex-end;flex-direction:column;align-items:center">
+        <div style="width:100%;display:flex;gap:2px;align-items:flex-end;height:100%">
+          <div style="flex:1;border-radius:3px 3px 0 0;background:color-mix(in oklab,var(--lime) 60%,transparent);height:62%"></div>
+          <div style="flex:1;border-radius:3px 3px 0 0;background:color-mix(in oklab,var(--orange) 60%,transparent);height:38%"></div>
+        </div>
+        <div style="font-size:8px;color:var(--muted);margin-top:4px;font-family:'JetBrains Mono',monospace">02</div>
+      </div>
+      <div style="flex:1;display:flex;gap:2px;align-items:flex-end;flex-direction:column;align-items:center">
+        <div style="width:100%;display:flex;gap:2px;align-items:flex-end;height:100%">
+          <div style="flex:1;border-radius:3px 3px 0 0;background:color-mix(in oklab,var(--lime) 60%,transparent);height:40%"></div>
+          <div style="flex:1;border-radius:3px 3px 0 0;background:color-mix(in oklab,var(--orange) 60%,transparent);height:52%"></div>
+        </div>
+        <div style="font-size:8px;color:var(--muted);margin-top:4px;font-family:'JetBrains Mono',monospace">03</div>
+      </div>
+      <div style="flex:1;display:flex;gap:2px;align-items:flex-end;flex-direction:column;align-items:center">
+        <div style="width:100%;display:flex;gap:2px;align-items:flex-end;height:100%">
+          <div style="flex:1;border-radius:3px 3px 0 0;background:var(--lime);height:100%"></div>
+          <div style="flex:1;border-radius:3px 3px 0 0;background:color-mix(in oklab,var(--orange) 70%,transparent);height:60%"></div>
+        </div>
+        <div style="font-size:8px;color:var(--lime);margin-top:4px;font-family:'JetBrains Mono',monospace;font-weight:700">04</div>
+      </div>
+      <div style="flex:1;display:flex;gap:2px;align-items:flex-end;flex-direction:column;align-items:center">
+        <div style="width:100%;display:flex;gap:2px;align-items:flex-end;height:100%">
+          <div style="flex:1;border-radius:3px 3px 0 0;background:color-mix(in oklab,var(--lime) 60%,transparent);height:70%"></div>
+          <div style="flex:1;border-radius:3px 3px 0 0;background:color-mix(in oklab,var(--orange) 60%,transparent);height:55%"></div>
+        </div>
+        <div style="font-size:8px;color:var(--muted);margin-top:4px;font-family:'JetBrains Mono',monospace">05</div>
+      </div>
+      <div style="flex:1;display:flex;gap:2px;align-items:flex-end;flex-direction:column;align-items:center">
+        <div style="width:100%;display:flex;gap:2px;align-items:flex-end;height:100%">
+          <div style="flex:1;border-radius:3px 3px 0 0;background:color-mix(in oklab,var(--lime) 60%,transparent);height:55%"></div>
+          <div style="flex:1;border-radius:3px 3px 0 0;background:var(--orange);height:100%"></div>
+        </div>
+        <div style="font-size:8px;color:var(--orange);margin-top:4px;font-family:'JetBrains Mono',monospace;font-weight:700">06</div>
+      </div>
+      <div style="flex:1;display:flex;gap:2px;align-items:flex-end;flex-direction:column;align-items:center">
+        <div style="width:100%;display:flex;gap:2px;align-items:flex-end;height:100%">
+          <div style="flex:1;border-radius:3px 3px 0 0;background:color-mix(in oklab,var(--lime) 60%,transparent);height:65%"></div>
+          <div style="flex:1;border-radius:3px 3px 0 0;background:color-mix(in oklab,var(--orange) 60%,transparent);height:42%"></div>
+        </div>
+        <div style="font-size:8px;color:var(--muted);margin-top:4px;font-family:'JetBrains Mono',monospace">07</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:16px;font-size:11px;color:var(--muted);margin-top:4px">
+      <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:var(--lime);display:inline-block"></span>ชัชชาติ</span>
+      <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:var(--orange);display:inline-block"></span>ดร.โจ ชัยวัฒน์</span>
+      <span style="margin-left:auto;font-family:'JetBrains Mono',monospace">★ peak days highlighted</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     FEATURE 4 — TOP POSTS & INFLUENCERS
+══════════════════════════════════════════ -->
+<section class="feat flip">
+  <div class="feat-copy">
+    <div class="feat-tag">Top Posts &amp; Influencers</div>
+    <h3>Find the tweets driving the narrative</h3>
+    <p class="feat-desc">
+      Ranked by engagement score (likes + retweets + replies), showing
+      the exact tweets and accounts that moved the needle on any given day.
+    </p>
+    <div class="feat-bullets">
+      <div class="fb">
+        <div class="fb-dot g">🏆</div>
+        <span>Top 5 posts sorted by engagement per keyword</span>
+      </div>
+      <div class="fb">
+        <div class="fb-dot g">👤</div>
+        <span>Top influencers by follower reach — zero-padded rank</span>
+      </div>
+      <div class="fb">
+        <div class="fb-dot g">#️⃣</div>
+        <span>Hashtag cloud with size scaled to mention frequency</span>
+      </div>
+      <div class="fb">
+        <div class="fb-dot g">🎨</div>
+        <span>Sentiment chip on each post (positive / neutral / negative)</span>
+      </div>
+    </div>
+  </div>
+  <div class="feat-visual">
+    <div class="vis-label">Top posts — ชัชชาติ</div>
+    <div class="post-card">
+      <div class="post-meta">
+        <div class="post-avatar" style="background:rgba(143,231,79,.15);color:var(--lime)">C</div>
         <div>
-          <div class="step-title">Clone &amp; configure</div>
-          <div class="step-desc">Clone the repo and copy the environment template.</div>
-          <pre><span class="cmd">git clone</span> https://github.com/Sirapakit/social-listening-bkk-election.git
-<span class="cmd">cd</span> social-listening-bkk-election
-<span class="cmd">cp</span> .env.example .env
-<span class="comment"># Edit .env — add your APIFY_API_TOKEN</span></pre>
+          <div class="post-handle">@chadchart_fan99</div>
         </div>
+        <div class="post-date">May 11</div>
+        <span style="margin-left:8px;font-size:10px;background:rgba(74,222,128,.1);color:var(--pos);border:1px solid rgba(74,222,128,.2);border-radius:4px;padding:2px 6px">positive</span>
       </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <div>
-          <div class="step-title">Start the backend</div>
-          <div class="step-desc">Create a Python virtual environment and run FastAPI.</div>
-          <pre><span class="cmd">python3 -m venv</span> backend/.venv
-<span class="cmd">source</span> backend/.venv/bin/activate
-<span class="cmd">pip install</span> -r backend/requirements.txt
-<span class="cmd">cd</span> backend && uvicorn main:app --reload --port 8000</pre>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <div>
-          <div class="step-title">Start the frontend</div>
-          <div class="step-desc">In a second terminal, install dependencies and run Next.js.</div>
-          <pre><span class="cmd">cd</span> frontend
-<span class="cmd">npm install</span>
-<span class="cmd">npm run dev</span>
-<span class="comment"># Open http://localhost:3000</span></pre>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">4</div>
-        <div>
-          <div class="step-title">Backfill historical data</div>
-          <div class="step-desc">On first load the dashboard shows missing days. Click <code>Backfill now</code> — it scrapes day-by-day and skips any day already stored. Adjust the tweet cap slider to control cost.</div>
-        </div>
+      <div class="post-text">ชัชชาติลงพื้นที่ดูน้ำท่วมวันนี้ เร็วมาก ประทับใจมาก 👍</div>
+      <div class="post-stats">
+        <span>❤️ 4,201</span><span>🔁 1,847</span><span>💬 312</span><span>👁 182K</span>
       </div>
     </div>
-  </section>
+    <div class="post-card">
+      <div class="post-meta">
+        <div class="post-avatar" style="background:rgba(143,231,79,.1);color:var(--lime)">B</div>
+        <div><div class="post-handle">@bkk_politics</div></div>
+        <div class="post-date">May 11</div>
+        <span style="margin-left:8px;font-size:10px;background:rgba(74,222,128,.1);color:var(--pos);border:1px solid rgba(74,222,128,.2);border-radius:4px;padding:2px 6px">positive</span>
+      </div>
+      <div class="post-text">ผลโพลล่าสุด ชัชชาติ 63% #กรุงเทพเลือกตั้ง2026</div>
+      <div class="post-stats">
+        <span>❤️ 2,890</span><span>🔁 1,204</span><span>💬 198</span><span>👁 94K</span>
+      </div>
+    </div>
+    <div class="vis-label" style="margin-top:4px">Top hashtags</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px">
+      <span style="border-radius:99px;padding:4px 10px;font-size:12px;border:1px solid;background:rgba(143,231,79,.1);color:var(--lime);border-color:rgba(143,231,79,.3)">#ชัชชาติ <span style="opacity:.6">·847</span></span>
+      <span style="border-radius:99px;padding:4px 10px;font-size:11px;border:1px solid;background:rgba(143,231,79,.07);color:var(--lime);border-color:rgba(143,231,79,.2)">#กรุงเทพ <span style="opacity:.6">·412</span></span>
+      <span style="border-radius:99px;padding:4px 10px;font-size:10px;border:1px solid;background:rgba(143,231,79,.05);color:var(--lime);border-color:rgba(143,231,79,.15)">#เลือกตั้ง2026 <span style="opacity:.6">·301</span></span>
+      <span style="border-radius:99px;padding:4px 10px;font-size:10px;border:1px solid;background:rgba(143,231,79,.04);color:var(--lime);border-color:rgba(143,231,79,.12)">#ผู้ว่ากทม <span style="opacity:.6">·188</span></span>
+    </div>
+  </div>
+</section>
 
-  <!-- ── Cost table ── -->
-  <section class="section">
-    <div class="section-header">
-      <div class="section-tag">Cost reference</div>
-      <h2>Scraping cost by cap setting</h2>
-      <p class="section-sub">2 candidates · 15 days · $0.00025 per tweet (realistic = 60% of cap on average)</p>
+<!-- ══════════════════════════════════════════
+     FEATURE 5 — COST CONTROL
+══════════════════════════════════════════ -->
+<section class="feat" id="cost">
+  <div class="feat-copy">
+    <div class="feat-tag orange">Cost Control</div>
+    <h3>See the price before you scrape</h3>
+    <p class="feat-desc">
+      Adjust a slider and watch the cost preview update instantly.
+      Idempotent backfill means already-scraped days are always free
+      on repeat runs — no surprise bills.
+    </p>
+    <div class="feat-bullets">
+      <div class="fb">
+        <div class="fb-dot o">$</div>
+        <span>$0.00025 per tweet · pay-per-result via Apify</span>
+      </div>
+      <div class="fb">
+        <div class="fb-dot o">🔁</div>
+        <span>Idempotent scrape_log — already-scraped days cost $0</span>
+      </div>
+      <div class="fb">
+        <div class="fb-dot o">🎛️</div>
+        <span>Slider cap: 100 → 10,000 tweets/day, step 100</span>
+      </div>
+      <div class="fb">
+        <div class="fb-dot o">⏰</div>
+        <span>Auto-scrape at noon daily via APScheduler — zero effort</span>
+      </div>
     </div>
-    <div style="overflow-x:auto">
-      <table style="width:100%;border-collapse:collapse;font-size:14px;font-family:'JetBrains Mono',monospace">
-        <thead>
-          <tr style="border-bottom:1px solid var(--border)">
-            <th style="padding:12px 16px;text-align:left;color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.06em">Cap / day</th>
-            <th style="padding:12px 16px;text-align:right;color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.06em">Max total</th>
-            <th style="padding:12px 16px;text-align:right;color:var(--lime);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.06em">Realistic</th>
-            <th style="padding:12px 16px;text-align:right;color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.06em">Per day</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr style="border-bottom:1px solid var(--border)">
-            <td style="padding:12px 16px;color:var(--text)">500</td>
-            <td style="padding:12px 16px;text-align:right;color:var(--muted)">$3.75</td>
-            <td style="padding:12px 16px;text-align:right;color:var(--lime);font-weight:700">$2.25</td>
-            <td style="padding:12px 16px;text-align:right;color:var(--muted)">$0.15</td>
-          </tr>
-          <tr style="border-bottom:1px solid var(--border)">
-            <td style="padding:12px 16px;color:var(--text)">1,000</td>
-            <td style="padding:12px 16px;text-align:right;color:var(--muted)">$7.50</td>
-            <td style="padding:12px 16px;text-align:right;color:var(--lime);font-weight:700">$4.50</td>
-            <td style="padding:12px 16px;text-align:right;color:var(--muted)">$0.30</td>
-          </tr>
-          <tr style="border-bottom:1px solid var(--border);background:color-mix(in oklab,var(--lime) 4%,transparent)">
-            <td style="padding:12px 16px;color:var(--lime);font-weight:700">2,000 ← default</td>
-            <td style="padding:12px 16px;text-align:right;color:var(--muted)">$15.00</td>
-            <td style="padding:12px 16px;text-align:right;color:var(--lime);font-weight:700">$9.00</td>
-            <td style="padding:12px 16px;text-align:right;color:var(--muted)">$0.60</td>
-          </tr>
-          <tr style="border-bottom:1px solid var(--border)">
-            <td style="padding:12px 16px;color:var(--text)">5,000</td>
-            <td style="padding:12px 16px;text-align:right;color:var(--muted)">$37.50</td>
-            <td style="padding:12px 16px;text-align:right;color:var(--lime);font-weight:700">$22.50</td>
-            <td style="padding:12px 16px;text-align:right;color:var(--muted)">$1.50</td>
-          </tr>
-          <tr>
-            <td style="padding:12px 16px;color:var(--text)">10,000</td>
-            <td style="padding:12px 16px;text-align:right;color:var(--muted)">$75.00</td>
-            <td style="padding:12px 16px;text-align:right;color:var(--lime);font-weight:700">$45.00</td>
-            <td style="padding:12px 16px;text-align:right;color:var(--muted)">$3.00</td>
-          </tr>
-        </tbody>
-      </table>
+  </div>
+  <div class="feat-visual">
+    <div class="vis-label">Tweet cap / day</div>
+    <div class="slider-wrap" style="margin-bottom:16px">
+      <div class="slider-track" style="flex:1">
+        <div class="slider-thumb"></div>
+      </div>
+      <div class="slider-val">2,000</div>
     </div>
-  </section>
+    <div class="cost-grid">
+      <div class="cost-tile" style="background:var(--surface);border-color:var(--border)">
+        <div class="cost-lbl">Scrape today</div>
+        <div class="cost-val">$0.60</div>
+        <div class="cost-lbl" style="margin-top:4px">2 keywords × 2k cap</div>
+      </div>
+      <div class="cost-tile" style="background:color-mix(in oklab,var(--lime) 5%,transparent);border-color:color-mix(in oklab,var(--lime) 25%,transparent)">
+        <div class="cost-lbl">Backfill 15 days</div>
+        <div class="cost-val" style="color:var(--lime)">~$9.00</div>
+        <div class="cost-lbl" style="margin-top:4px">realistic · ≤$15 max</div>
+      </div>
+      <div class="cost-tile" style="background:var(--surface);border-color:var(--border)">
+        <div class="cost-lbl">Daily auto-scrape</div>
+        <div class="cost-val">$0.60</div>
+        <div class="cost-lbl" style="margin-top:4px">Runs at 12:00 daily</div>
+      </div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;margin-top:4px">
+      <div class="vis-label">Reference — 2 candidates · 15 days</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px">
+        <div style="color:var(--muted)">500 cap<br><span style="color:var(--lime);font-weight:700">~$2.25</span></div>
+        <div style="color:var(--muted)">1k cap<br><span style="color:var(--lime);font-weight:700">~$4.50</span></div>
+        <div style="color:var(--lime);font-weight:700">2k cap ←<br><span style="color:var(--lime)">~$9.00</span></div>
+        <div style="color:var(--muted)">5k cap<br><span style="color:var(--lime);font-weight:700">~$22.50</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div><!-- end .features -->
+
+<!-- ══ QUICK SETUP ══ -->
+<div class="setup-strip" style="margin-top:80px">
+  <div class="setup-cell">
+    <div class="setup-num">1</div>
+    <div class="setup-title">Clone &amp; configure</div>
+    <div class="setup-desc">Clone the repo and fill in <code>.env</code> with your Apify API token.</div>
+  </div>
+  <div class="setup-cell">
+    <div class="setup-num">2</div>
+    <div class="setup-title">Start backend</div>
+    <div class="setup-desc">Python venv → <code>pip install -r requirements.txt</code> → <code>uvicorn main:app</code></div>
+  </div>
+  <div class="setup-cell">
+    <div class="setup-num">3</div>
+    <div class="setup-title">Start frontend</div>
+    <div class="setup-desc"><code>npm install</code> → <code>npm run dev</code> → open <code>localhost:3000</code></div>
+  </div>
+  <div class="setup-cell">
+    <div class="setup-num">4</div>
+    <div class="setup-title">Backfill &amp; go</div>
+    <div class="setup-desc">Click <strong>Backfill now</strong> on first load. Dashboard stays fresh automatically at noon daily.</div>
+  </div>
 </div>
 
-<!-- ── Footer ── -->
+</div><!-- end .wrap -->
+
+<!-- ══ FOOTER ══ -->
 <footer>
   <div class="wrap">
-    <div class="footer-links">
+    <div class="footer-row">
       <a href="https://github.com/Sirapakit/social-listening-bkk-election" target="_blank" rel="noopener">GitHub</a>
       <a href="https://github.com/Sirapakit/social-listening-bkk-election/blob/main/IMPROVEMENT_PLAN.md" target="_blank" rel="noopener">Improvement Plan</a>
       <a href="https://apify.com" target="_blank" rel="noopener">Apify</a>
       <a href="https://pythainlp.github.io" target="_blank" rel="noopener">PyThaiNLP</a>
     </div>
-    <p>Data via Apify · Sentiment via custom Thai lexicon + PyThaiNLP · SQLite-backed history</p>
-    <p style="margin-top:8px;opacity:.6">Built for the Bangkok Governor Election 2026</p>
+    <p>Data via Apify · Thai sentiment via custom lexicon + PyThaiNLP · SQLite-backed history</p>
+    <p style="margin-top:6px;opacity:.5">Built for the Bangkok Governor Election 2026</p>
   </div>
 </footer>
 
