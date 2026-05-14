@@ -1,0 +1,47 @@
+# ── Secrets / config ──────────────────────────────────────────────────────────
+.env
+.env.local
+.env.*
+!.env.example
+*.local
+*.secret
+
+# ── Database / data ───────────────────────────────────────────────────────────
+backend/data/*.db
+backend/data/*.db-shm
+backend/data/*.db-wal
+
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.eggs/
+.venv/
+venv/
+env/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+
+# ── Node / Next.js ────────────────────────────────────────────────────────────
+node_modules/
+.next/
+out/
+dist/
+build/
+.turbo/
+*.tsbuildinfo
+
+# ── OS & editors ─────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ── Logs & cache ─────────────────────────────────────────────────────────────
+.cache/
+*.log

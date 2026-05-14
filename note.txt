@@ -1,0 +1,7 @@
+                          ⌛ scraping direction
+                    ◀────────────────────────────
+  FROM 05-01 ─────────────────────────────────── TO 05-12
+                                                  │
+                                                  └─ starts here
+                                                     pulls newest first
+                                                     until MAX or FROM
