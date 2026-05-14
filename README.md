@@ -6,6 +6,8 @@ locally, and renders a polished comparison dashboard.
 
 ![preview](./docs/preview.png)
 
+https://sirapakit.github.io/social-listening-bkk-election/ 
+
 ## What it does
 
 - 🔍 Compares two candidate keyword bundles side-by-side (default: **ชัชชาติ** vs **ดร.โจ ชัยวัฒน์**)
