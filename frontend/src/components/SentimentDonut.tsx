@@ -1,5 +1,6 @@
 "use client";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
+import { useT } from "@/lib/i18n";
 
 interface Props {
   sentiment: { positive: number; neutral: number; negative: number };
@@ -7,11 +8,12 @@ interface Props {
 }
 
 export function SentimentDonut({ sentiment, label }: Props) {
+  const { t } = useT();
   const total = sentiment.positive + sentiment.neutral + sentiment.negative;
   const data = [
-    { name: "Positive", value: sentiment.positive, color: "var(--pos)" },
-    { name: "Neutral",  value: sentiment.neutral,  color: "var(--neu)" },
-    { name: "Negative", value: sentiment.negative, color: "var(--neg)" },
+    { name: t.sentPositive, value: sentiment.positive, color: "var(--pos)" },
+    { name: t.sentNeutral,  value: sentiment.neutral,  color: "var(--neu)" },
+    { name: t.sentNegative, value: sentiment.negative, color: "var(--neg)" },
   ];
   const posPct = total ? Math.round((sentiment.positive * 100) / total) : 0;
 
@@ -46,7 +48,7 @@ export function SentimentDonut({ sentiment, label }: Props) {
         </ResponsiveContainer>
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
           <div className="text-2xl font-bold tabular-nums">{posPct}%</div>
-          <div className="text-[10px] uppercase tracking-wider text-muted">positive</div>
+          <div className="text-[10px] uppercase tracking-wider text-muted">{t.sentLabel}</div>
         </div>
       </div>
       <div className="flex flex-col gap-1.5 text-sm">

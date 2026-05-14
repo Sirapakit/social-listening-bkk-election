@@ -1,22 +1,24 @@
 "use client";
 import { BadgeCheck } from "lucide-react";
+import { useT } from "@/lib/i18n";
 import { formatNumber } from "@/lib/api";
 import type { KeywordResult } from "@/lib/types";
 
 export function TopInfluencers({ result }: { result: KeywordResult }) {
+  const { t } = useT();
   return (
     <div className="card p-5">
       <div className="flex items-baseline justify-between mb-3">
         <h3 className="text-[var(--text-sm)] uppercase tracking-wider text-muted font-medium">
-          Top influencers
+          {t.topInfluencers}
         </h3>
-        <span className="text-[11px] text-muted">by engagement</span>
+        <span className="text-[11px] text-muted">{t.byEngagement}</span>
       </div>
       <div className="flex flex-col">
         {result.top_influencers.length === 0 ? (
           <div className="text-sm text-muted py-8 text-center">
             <div className="opacity-50 mb-1">—</div>
-            No data
+            {t.noData}
           </div>
         ) : (
           result.top_influencers.slice(0, 8).map((u, i) => (
@@ -48,12 +50,12 @@ export function TopInfluencers({ result }: { result: KeywordResult }) {
                   {u.verified && <BadgeCheck className="w-3.5 h-3.5 text-[color:var(--lime)] shrink-0" />}
                 </div>
                 <div className="text-[11px] text-muted truncate tabular">
-                  @{u.username} · {formatNumber(u.followers)} flws
+                  @{u.username} · {formatNumber(u.followers)} {t.followersAbbr}
                 </div>
               </div>
               <div className="text-right tabular">
                 <div className="text-sm font-semibold">{formatNumber(u.engagement)}</div>
-                <div className="text-[10px] text-muted">{u.tweets} tweet{u.tweets > 1 ? "s" : ""}</div>
+                <div className="text-[10px] text-muted">{t.tweetSuffix(u.tweets)}</div>
               </div>
             </a>
           ))

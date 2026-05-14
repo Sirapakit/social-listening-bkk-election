@@ -7,6 +7,7 @@ import {
   daysBetween,
   realisticCost,
 } from "@/lib/api";
+import { useT } from "@/lib/i18n";
 
 interface Props {
   keywords: KeywordSpec[];
@@ -28,6 +29,7 @@ interface Props {
 }
 
 export function ControlsBar(props: Props) {
+  const { t } = useT();
   const {
     keywords, setKeywords,
     startDate, setStartDate,
@@ -72,7 +74,7 @@ export function ControlsBar(props: Props) {
               <input
                 value={k.query}
                 onChange={(e) => updateQuery(i, e.target.value)}
-                placeholder="X.com search query — supports OR, @, #"
+                placeholder={t.queryPlaceholder}
                 className="w-full bg-[var(--surface-2)]/60 border border-[var(--border)] rounded-lg pl-9 pr-3 py-2 text-sm font-mono focus:border-[var(--lime)]/50 transition"
               />
             </div>
@@ -83,13 +85,13 @@ export function ControlsBar(props: Props) {
       {/* Date + cap slider grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
         <DateField
-          label="From"
+          label={t.dateFrom}
           icon={<CalendarRange className="w-3 h-3" />}
           value={startDate}
           onChange={setStartDate}
         />
         <DateField
-          label="To"
+          label={t.dateTo}
           icon={<CalendarRange className="w-3 h-3" />}
           value={endDate}
           onChange={setEndDate}
@@ -98,10 +100,10 @@ export function ControlsBar(props: Props) {
           <label className="text-[11px] uppercase tracking-wider text-muted font-medium flex items-baseline justify-between">
             <span className="flex items-center gap-1.5">
               <SlidersHorizontal className="w-3 h-3" />
-              Tweet cap / day
+              {t.tweetCap}
             </span>
             <span className="text-[10px] normal-case tracking-normal opacity-70">
-              max {maxAllowed.toLocaleString()}
+              {t.maxLabel(maxAllowed)}
             </span>
           </label>
           <div className="flex gap-2 items-center">
@@ -134,34 +136,30 @@ export function ControlsBar(props: Props) {
       <div className="rounded-xl border border-[var(--border)] bg-gradient-to-br from-[var(--surface-2)]/60 to-[var(--surface)]/60 p-4">
         <div className="text-[var(--text-xs)] uppercase tracking-wider text-muted font-medium mb-3 flex items-center gap-2">
           <Zap className="w-3 h-3 text-[color:var(--lime)]" />
-          Cost preview
+          {t.costPreview}
           <span className="opacity-50 normal-case tracking-normal">
-            · ${pricePerTweet.toFixed(5)} per tweet
+            {t.perTweet(pricePerTweet)}
           </span>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <CostTile
-            label="Per day (Scrape today)"
+            label={t.costPerDay}
             realistic={todayRealistic}
             max={todayMax}
-            note={`${keywords.length} keywords × ${cap.toLocaleString()} cap`}
+            note={t.capNote(keywords.length, cap)}
           />
           <CostTile
-            label={`Backfill ${days} day${days === 1 ? "" : "s"}`}
+            label={t.costBackfill(days)}
             realistic={backfillRealistic}
             max={backfillMax}
             highlight
-            note="Idempotent — already-scraped days are free."
+            note={t.idempotent}
           />
           <CostTile
-            label="Daily auto-scrape"
+            label={t.costDaily}
             realistic={todayRealistic}
             max={todayMax}
-            note={
-              scheduleEnabled
-                ? `Runs at ${String(scheduleHour).padStart(2, "0")}:00 every day`
-                : "Schedule disabled"
-            }
+            note={scheduleEnabled ? t.scheduleRuns(scheduleHour) : t.scheduleOff}
           />
         </div>
       </div>
@@ -171,29 +169,29 @@ export function ControlsBar(props: Props) {
         <button
           onClick={onScrapeToday}
           disabled={loadingToday || loadingBackfill}
-          title={`Scrape today only (${keywords.length} keywords) — max $${todayMax.toFixed(2)}`}
+          title={`${t.scrapeTodayBtn} (${keywords.length} keywords) — max $${todayMax.toFixed(2)}`}
           className="flex items-center gap-2 px-4 py-2.5 rounded-lg font-semibold border border-[var(--border-strong)] bg-[var(--surface-2)]/40 hover:bg-[var(--surface-2)] hover:border-[var(--lime)]/40 disabled:opacity-50 disabled:cursor-not-allowed transition"
         >
           {loadingToday ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-          Scrape today
+          {t.scrapeTodayBtn}
           <span className="text-xs text-muted font-mono ml-1">~${todayRealistic.toFixed(2)}</span>
         </button>
 
         <button
           onClick={onBackfill}
           disabled={loadingBackfill || loadingToday || days === 0}
-          title={`Backfill ${days} day${days === 1 ? "" : "s"} — max $${backfillMax.toFixed(2)}, idempotent`}
+          title={`${t.backfillBtn(days)} — max $${backfillMax.toFixed(2)}`}
           className="btn-primary flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold"
         >
           {loadingBackfill ? <Loader2 className="w-4 h-4 animate-spin" /> : <Database className="w-4 h-4" />}
-          Backfill {days} day{days === 1 ? "" : "s"}
+          {t.backfillBtn(days)}
           <span className="text-xs font-mono opacity-80 ml-1">≤ ${backfillMax.toFixed(2)}</span>
         </button>
 
         <div className="text-[11px] text-muted ml-auto max-w-[280px] text-right leading-snug">
-          Opens to fresh data automatically. Missing days are scraped on visit.
+          {t.autoNote}
           {scheduleEnabled && (
-            <> Daily refresh at <span className="text-foreground">{String(scheduleHour).padStart(2, "0")}:00</span>.</>
+            <span className="text-foreground">{t.dailyRefresh(scheduleHour)}</span>
           )}
         </div>
       </div>

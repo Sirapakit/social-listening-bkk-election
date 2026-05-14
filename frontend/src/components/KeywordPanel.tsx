@@ -1,5 +1,6 @@
 "use client";
 import { MessageSquare, Users, Heart, Eye } from "lucide-react";
+import { useT } from "@/lib/i18n";
 import type { KeywordResult } from "@/lib/types";
 import { MetricCard } from "./MetricCard";
 import { SentimentDonut } from "./SentimentDonut";
@@ -8,6 +9,7 @@ import { TopInfluencers } from "./TopInfluencers";
 import { HashtagCloud } from "./HashtagCloud";
 
 export function KeywordPanel({ result }: { result: KeywordResult }) {
+  const { t } = useT();
   return (
     <section
       className="card-strong p-5 flex flex-col gap-4"
@@ -28,32 +30,32 @@ export function KeywordPanel({ result }: { result: KeywordResult }) {
             background: `color-mix(in oklab, ${result.color} 14%, transparent)`,
           }}
         >
-          {result.share_of_voice}% SoV
+          {result.share_of_voice}{t.sovSuffix}
         </span>
       </header>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <MetricCard
-          label="Buzz (tweets)"
+          label={t.buzzMetric}
           value={result.totals.tweets}
           accent={result.color}
           icon={<MessageSquare className="w-3 h-3" />}
           index={0}
         />
         <MetricCard
-          label="Reach (followers)"
+          label={t.reachMetric}
           value={result.totals.reach}
           icon={<Users className="w-3 h-3" />}
           index={1}
         />
         <MetricCard
-          label="Engagement"
+          label={t.engagementMetric}
           value={result.totals.engagement}
           icon={<Heart className="w-3 h-3" />}
           index={2}
         />
         <MetricCard
-          label="Views"
+          label={t.viewsMetric}
           value={result.totals.views}
           icon={<Eye className="w-3 h-3" />}
           index={3}

@@ -1,17 +1,19 @@
 "use client";
 import type { KeywordResult } from "@/lib/types";
+import { useT } from "@/lib/i18n";
 
 interface Props {
   results: KeywordResult[];
 }
 
 export function ShareOfVoice({ results }: Props) {
+  const { t } = useT();
   const total = results.reduce((s, r) => s + r.totals.tweets, 0) || 1;
   return (
     <div className="card p-5">
       <div className="flex items-baseline justify-between mb-4">
-        <h3 className="text-sm uppercase tracking-wider text-muted">Share of voice</h3>
-        <span className="text-[11px] text-muted">{total.toLocaleString()} total tweets</span>
+        <h3 className="text-sm uppercase tracking-wider text-muted">{t.shareOfVoice}</h3>
+        <span className="text-[11px] text-muted">{t.totalTweets(total)}</span>
       </div>
       <div className="flex h-8 w-full overflow-hidden rounded-full ring-1 ring-[var(--border)]">
         {results.map((r) => {

@@ -8,8 +8,12 @@ import { CoverageBar } from "@/components/CoverageBar";
 import { BuzzTimeline } from "@/components/BuzzTimeline";
 import { ShareOfVoice } from "@/components/ShareOfVoice";
 import { KeywordPanel } from "@/components/KeywordPanel";
+import { LanguageProvider, useT } from "@/lib/i18n";
 
-export default function Dashboard() {
+// ── Inner dashboard (uses language context) ──────────────────────────────────
+function DashboardInner() {
+  const { t, lang, toggle } = useT();
+
   const [presets, setPresets] = useState<PresetsResponse | null>(null);
   const [keywords, setKeywords] = useState<KeywordSpec[]>([]);
   const [startDate, setStartDate] = useState("");
@@ -115,7 +119,7 @@ export default function Dashboard() {
                 Bangkok <span className="gradient-text">Election</span>: Social Listening
               </h1>
               <p className="text-[13px] text-muted mt-0.5">
-                2026 · X.com buzz, reach &amp; sentiment
+                {t.subtitle}
               </p>
             </div>
           </div>
@@ -123,15 +127,25 @@ export default function Dashboard() {
             {lastUpdated && (
               <span className="flex items-center gap-1.5 tabular">
                 <Activity className="w-3.5 h-3.5 text-[color:var(--lime)]" />
-                Loaded {lastUpdated.toLocaleTimeString("th-TH", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
+                {t.loaded} {lastUpdated.toLocaleTimeString("th-TH", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
               </span>
             )}
             {presets?.schedule.enabled && (
               <span className="hidden sm:flex items-center gap-1.5 tabular px-2 py-1 rounded-md bg-[var(--surface-2)]/50 border border-[var(--border)]">
                 <Clock className="w-3 h-3" />
-                Auto · {String(presets.schedule.hour).padStart(2, "0")}:{String(presets.schedule.minute).padStart(2, "0")}
+                {t.auto} · {String(presets.schedule.hour).padStart(2, "0")}:{String(presets.schedule.minute).padStart(2, "0")}
               </span>
             )}
+            {/* Language toggle */}
+            <button
+              onClick={toggle}
+              aria-label="Switch language"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-[var(--border)] bg-[var(--surface-2)]/50 hover:border-[var(--lime)]/40 hover:bg-[var(--surface-2)] transition text-[11px] font-semibold tabular"
+            >
+              <span style={{ color: lang === "th" ? "var(--lime)" : "var(--muted)" }}>TH</span>
+              <span className="text-[var(--border-strong)]">/</span>
+              <span style={{ color: lang === "en" ? "var(--lime)" : "var(--muted)" }}>EN</span>
+            </button>
           </div>
         </header>
 
@@ -168,18 +182,18 @@ export default function Dashboard() {
             <Sparkles className="w-4 h-4 text-[color:var(--lime)] shrink-0 pulse-soft" />
             <div className="flex-1 min-w-0">
               <span className="font-medium">{missingDayCount}</span>{" "}
-              day{missingDayCount === 1 ? "" : "s"} missing across keywords —
-              <span className="text-muted"> click Backfill to fetch (idempotent).</span>
+              {t.missingDays(missingDayCount)}{" "}
+              <span className="text-muted">{t.missingDaysHint}</span>
             </div>
             <button
               onClick={onBackfill}
               className="btn-primary px-3 py-1.5 rounded-md text-xs"
             >
-              Backfill now
+              {t.backfillNow}
             </button>
             <button
               onClick={() => setToastDismissed(true)}
-              aria-label="Dismiss"
+              aria-label={t.dismiss}
               className="text-xs text-muted hover:text-foreground p-1 rounded-md hover:bg-[var(--surface-3)] transition"
             >
               <X className="w-3.5 h-3.5" />
@@ -193,16 +207,16 @@ export default function Dashboard() {
                style={{ borderColor: "color-mix(in oklab, var(--neg) 40%, var(--border))" }}>
             <AlertCircle className="w-5 h-5 text-[color:var(--neg)] shrink-0 mt-0.5" />
             <div className="text-sm flex-1 min-w-0">
-              <div className="font-semibold text-[color:var(--neg)]">Something went wrong</div>
+              <div className="font-semibold text-[color:var(--neg)]">{t.errorTitle}</div>
               <div className="text-muted mt-1 whitespace-pre-wrap break-words">{error}</div>
               <div className="text-xs text-muted mt-2">
-                Tip: ensure the backend is running on{" "}
+                {t.errorTip}{" "}
                 <code className="text-foreground font-mono">localhost:8000</code>.
               </div>
             </div>
             <button
               onClick={() => setError(null)}
-              aria-label="Dismiss error"
+              aria-label={t.dismissError}
               className="text-xs text-muted hover:text-foreground p-1 rounded hover:bg-[var(--surface-3)] transition"
             >
               <X className="w-3.5 h-3.5" />
@@ -218,10 +232,9 @@ export default function Dashboard() {
               <span className="absolute inset-0 rounded-full bg-[color:var(--lime)]/30 blur-md pulse-soft" />
             </div>
             <div className="text-sm flex-1">
-              <div className="font-medium">Scraping day-by-day…</div>
+              <div className="font-medium">{t.scrapingTitle}</div>
               <div className="text-muted text-xs">
-                {keywords.length} keyword{keywords.length === 1 ? "" : "s"} ·
-                {" "}from {startDate} to {endDate}. Already-scraped days are skipped automatically.
+                {t.scrapingDesc(keywords.length, startDate, endDate)}
               </div>
             </div>
           </div>
@@ -237,11 +250,21 @@ export default function Dashboard() {
               <BarChart3 className="w-10 h-10 text-[color:var(--lime)]" />
               <span className="absolute inset-0 rounded-full bg-[color:var(--lime)]/20 blur-lg pulse-soft" />
             </div>
-            <h2 className="text-lg font-semibold">No data yet for this window</h2>
+            <h2 className="text-lg font-semibold">{t.noDataTitle}</h2>
             <p className="text-sm text-muted max-w-md">
-              Click <span className="text-[color:var(--lime)] font-medium">Backfill</span> above to scrape every day from{" "}
-              <span className="text-foreground tabular">{startDate}</span> to{" "}
-              <span className="text-foreground tabular">{endDate}</span>.
+              {lang === "th" ? (
+                <>
+                  คลิกปุ่ม{" "}
+                  <span className="text-[color:var(--lime)] font-medium">{t.noDataAction}</span>{" "}
+                  {t.noDataDesc(startDate, endDate)}
+                </>
+              ) : (
+                <>
+                  Click{" "}
+                  <span className="text-[color:var(--lime)] font-medium">{t.noDataAction}</span>{" "}
+                  {t.noDataDesc(startDate, endDate)}
+                </>
+              )}
             </p>
           </div>
         )}
@@ -262,9 +285,18 @@ export default function Dashboard() {
         )}
 
         <footer className="text-center text-xs text-muted pt-6 pb-2">
-          Data via Apify · Sentiment via lexicon on PyThaiNLP tokenizer · SQLite-backed history
+          {t.footerText}
         </footer>
       </div>
     </main>
+  );
+}
+
+// ── Root export (wraps with provider so all children can useT) ───────────────
+export default function Dashboard() {
+  return (
+    <LanguageProvider>
+      <DashboardInner />
+    </LanguageProvider>
   );
 }

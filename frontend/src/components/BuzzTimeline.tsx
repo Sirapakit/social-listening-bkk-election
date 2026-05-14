@@ -1,4 +1,5 @@
 "use client";
+import { useT } from "@/lib/i18n";
 import {
   AreaChart,
   Area,
@@ -16,6 +17,7 @@ interface Props {
 }
 
 export function BuzzTimeline({ results }: Props) {
+  const { t } = useT();
   // Merge timelines into a single date-indexed series
   const byDate: Record<string, Record<string, number | string>> = {};
   for (const r of results) {
@@ -31,8 +33,8 @@ export function BuzzTimeline({ results }: Props) {
   return (
     <div className="card p-5">
       <div className="flex items-baseline justify-between mb-4">
-        <h3 className="text-sm uppercase tracking-wider text-muted">Buzz over time</h3>
-        <span className="text-[11px] text-muted">tweets per day</span>
+        <h3 className="text-sm uppercase tracking-wider text-muted">{t.buzzTitle}</h3>
+        <span className="text-[11px] text-muted">{t.tweetsPerDay}</span>
       </div>
       <div className="h-[260px]">
         <ResponsiveContainer>

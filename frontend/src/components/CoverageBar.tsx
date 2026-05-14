@@ -3,6 +3,7 @@ import { useState } from "react";
 import { AlertTriangle, CheckCircle2, CircleDashed, Loader2, X, Zap } from "lucide-react";
 import type { KeywordCoverage, KeywordSpec, DayCoverage } from "@/lib/types";
 import { deepScrape } from "@/lib/api";
+import { useT } from "@/lib/i18n";
 
 interface Props {
   coverage: Record<string, KeywordCoverage>;
@@ -16,13 +17,15 @@ const statusColor: Record<string, string> = {
   missing:  "var(--muted)",
 };
 
-const statusLabel: Record<string, string> = {
-  complete: "complete",
-  sampled:  "sampled (hit cap)",
-  missing:  "missing",
-};
+// statusLabel is now dynamic (see useT inside component)
 
 export function CoverageBar({ coverage, keywords, onRefetch }: Props) {
+  const { t } = useT();
+  const statusLabel: Record<string, string> = {
+    complete: t.statusComplete,
+    sampled:  t.statusSampled,
+    missing:  t.statusMissing,
+  };
   const [busy, setBusy] = useState<string | null>(null);
   const [selected, setSelected] = useState<{ key: string; day: DayCoverage } | null>(null);
 
@@ -44,9 +47,9 @@ export function CoverageBar({ coverage, keywords, onRefetch }: Props) {
       <div className="flex items-baseline justify-between flex-wrap gap-2 mb-4">
         <div className="flex items-baseline gap-3">
           <h3 className="text-[var(--text-sm)] uppercase tracking-wider text-muted font-medium">
-            Coverage
+            {t.coverageTitle}
           </h3>
-          <span className="text-[11px] text-muted">click a day for details</span>
+          <span className="text-[11px] text-muted">{t.clickForDetails}</span>
         </div>
         <div className="flex items-center gap-3 text-[11px] text-muted">
           {(["complete", "sampled", "missing"] as const).map((s) => (
@@ -129,7 +132,7 @@ export function CoverageBar({ coverage, keywords, onRefetch }: Props) {
                 <span className="text-foreground font-medium">
                   {c.totals.tweets.toLocaleString()}
                 </span>{" "}
-                tweets · ${c.totals.cost_usd.toFixed(2)}
+                {t.tweetsWord} · ${c.totals.cost_usd.toFixed(2)}
               </div>
             </div>
           );
@@ -140,6 +143,7 @@ export function CoverageBar({ coverage, keywords, onRefetch }: Props) {
         <SelectedDayDetail
           day={selected.day}
           keywordKey={selected.key}
+          statusLabel={statusLabel}
           busy={busy === `${selected.key}-${selected.day.day}`}
           onDeepScrape={() => handleDeepScrape(selected.key, selected.day.day)}
           onClose={() => setSelected(null)}
@@ -150,14 +154,16 @@ export function CoverageBar({ coverage, keywords, onRefetch }: Props) {
 }
 
 function SelectedDayDetail({
-  day, keywordKey, busy, onDeepScrape, onClose,
+  day, keywordKey, statusLabel, busy, onDeepScrape, onClose,
 }: {
   day: DayCoverage;
   keywordKey: string;
+  statusLabel: Record<string, string>;
   busy: boolean;
   onDeepScrape: () => void;
   onClose: () => void;
 }) {
+  const { t } = useT();
   const deepCost = 24 * 500 * 0.00025;
   const StatusIcon =
     day.status === "complete" ? CheckCircle2
@@ -192,10 +198,10 @@ function SelectedDayDetail({
           <div className="text-base font-semibold mt-0.5">{day.day}</div>
           <div className="text-sm text-muted mt-1 tabular">
             {day.status === "missing" ? (
-              <>No data yet for this day. Use <span className="text-foreground">Backfill</span> above.</>
+              <>{t.noDataDay} <span className="text-foreground">{t.useBackfill}</span></>
             ) : (
               <>
-                {day.tweets.toLocaleString()} tweets · ${day.cost.toFixed(4)}
+                {day.tweets.toLocaleString()} {t.tweetsWord} · ${day.cost.toFixed(4)}
               </>
             )}
           </div>
@@ -222,10 +228,10 @@ function SelectedDayDetail({
             }}
           >
             {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5" />}
-            Deep-scrape this day
+            {t.deepScrapeBtn}
           </button>
           <span className="text-[11px] text-muted tabular">
-            24 hourly slices · up to 12,000 tweets · ~${deepCost.toFixed(2)}
+            {t.deepScrapeNote(deepCost)}
           </span>
         </div>
       )}

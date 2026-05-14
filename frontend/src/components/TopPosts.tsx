@@ -1,5 +1,6 @@
 "use client";
 import { Heart, MessageCircle, Repeat2, ExternalLink, BadgeCheck } from "lucide-react";
+import { useT } from "@/lib/i18n";
 import { formatNumber } from "@/lib/api";
 import type { KeywordResult } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -11,19 +12,20 @@ const sentimentChip: Record<string, { label: string; cls: string }> = {
 };
 
 export function TopPosts({ result }: { result: KeywordResult }) {
+  const { t } = useT();
   return (
     <div className="card p-5 flex flex-col min-h-0">
       <div className="flex items-baseline justify-between mb-3">
         <h3 className="text-[var(--text-sm)] uppercase tracking-wider text-muted font-medium">
-          Top posts
+          {t.topPosts}
         </h3>
-        <span className="text-[11px] text-muted">by engagement</span>
+        <span className="text-[11px] text-muted">{t.byEngagement}</span>
       </div>
       <div className="scroll-y flex flex-col gap-3 pr-1" style={{ maxHeight: 460 }}>
         {result.top_posts.length === 0 ? (
           <div className="text-sm text-muted py-8 text-center">
             <div className="opacity-50 mb-1">—</div>
-            No posts yet
+            {t.noPosts}
           </div>
         ) : (
           result.top_posts.map((p, i) => {
@@ -45,7 +47,7 @@ export function TopPosts({ result }: { result: KeywordResult }) {
                   )}
                   <span className="text-xs text-muted truncate">@{p.author.username}</span>
                   <span className="ml-auto text-[10px] text-muted tabular shrink-0">
-                    {formatNumber(p.author.followers)} flws
+                    {formatNumber(p.author.followers)} {t.followersAbbr}
                   </span>
                   <span
                     className={cn(
