@@ -1,86 +1,111 @@
 @import "tailwindcss";
 
 /* ============================================================================
-   Chadchart Social Listening — design tokens
-   Palette: drawn from the user's WORK WORK เวิร์ก! poster
-   - bright lime green  → primary brand accent
-   - deep forest green  → background
-   - white / off-white  → primary text
-   - orange             → opposing-candidate accent
+   Bangkok Election 2026 — Social Listening
+   Design System: Light editorial dashboard
+   Color-coded information:
+     Green  → positive sentiment / complete coverage / success
+     Red    → negative sentiment / missing data / error
+     Orange → neutral sentiment / sampled data / warning
+     Blue   → running / active / informational
    ============================================================================ */
 
 :root {
-  /* --- surfaces --------------------------------------------------------- */
-  --background: #050f08;
-  --surface-0: #081c10;       /* lowest card */
-  --surface:   #0d2918;       /* default card */
-  --surface-2: #103a20;       /* hover / elevated */
-  --surface-3: #154e29;       /* press / active */
-  --border:    #1c4a2e;
-  --border-strong: #265f3b;
-  --muted:     #6b8b78;
-  --muted-2:   #94b3a3;
-  --foreground:#eaf5ec;
+  /* --- surfaces ---------------------------------------------------------- */
+  --background: #f7f7f6;
+  --surface-0: #fafaf9;
+  --surface:   #ffffff;
+  --surface-2: #f3f3f1;
+  --surface-3: #ebebea;
+  --border:    #e4e3df;
+  --border-strong: #ccccc6;
+  --muted:     #6b7060;
+  --muted-2:   #9b9b90;
+  --foreground: #0c0c0b;
 
-  /* --- brand ----------------------------------------------------------- */
-  --lime:       #8FE74F;
-  --lime-2:     #b5f47c;
-  --lime-glow:  rgba(143, 231, 79, 0.45);
-  --dark-green: #0F3B1F;
-  --orange:     #F26B2C;
-  --orange-2:   #ff8a52;
+  /* --- sidebar ----------------------------------------------------------- */
+  --sidebar-bg:          #0c0c0b;
+  --sidebar-icon:        #47473f;
+  --sidebar-icon-active: #f7f7f6;
+  --sidebar-icon-hover:  #1e1e1c;
+  --sidebar-w:           56px;
 
-  /* --- semantic ------------------------------------------------------- */
-  --pos: #6ee7a3;
-  --neu: #8aa9b8;
-  --neg: #ff6b6b;
+  /* --- semantic colors (information color-coding) ----------------------- */
+  /* GREEN  = positive sentiment / complete coverage / success            */
+  --pos:        #15803d;
+  --pos-2:      #16a34a;
+  --pos-light:  #dcfce7;
+  --pos-dot:    #22c55e;
 
-  /* --- type scale (rem) ------------------------------------------------ */
-  --text-xs:   0.6875rem;     /* 11px - micro labels */
-  --text-sm:   0.8125rem;     /* 13px - meta */
-  --text-base: 0.9375rem;     /* 15px - body */
-  --text-lg:   1.0625rem;     /* 17px - section title */
-  --text-xl:   1.375rem;      /* 22px - panel title */
-  --text-2xl:  1.875rem;      /* 30px - h1 */
-  --text-3xl:  2.5rem;        /* 40px - hero number */
+  /* RED    = negative sentiment / missing data / error                   */
+  --neg:        #b91c1c;
+  --neg-2:      #dc2626;
+  --neg-light:  #fee2e2;
+  --neg-dot:    #f87171;
 
-  /* --- spacing rhythm (8pt grid) -------------------------------------- */
-  --space-1: 0.25rem;         /* 4 */
-  --space-2: 0.5rem;          /* 8 */
-  --space-3: 0.75rem;         /* 12 */
-  --space-4: 1rem;            /* 16 */
-  --space-5: 1.25rem;         /* 20 */
-  --space-6: 1.5rem;          /* 24 */
-  --space-8: 2rem;            /* 32 */
+  /* ORANGE = neutral sentiment / sampled data / warning                  */
+  --neu:        #c2410c;
+  --neu-2:      #ea580c;
+  --neu-light:  #ffedd5;
+  --neu-dot:    #fb923c;
 
-  /* --- radii ----------------------------------------------------------- */
-  --radius-sm: 8px;
-  --radius:    14px;
-  --radius-lg: 18px;
-  --radius-xl: 22px;
+  /* BLUE   = informational / running / active                            */
+  --info:       #1d4ed8;
+  --info-2:     #2563eb;
+  --info-light: #dbeafe;
+  --info-dot:   #60a5fa;
+
+  /* Legacy aliases used by existing components */
+  --lime:       #15803d;
+  --lime-2:     #16a34a;
+  --lime-glow:  rgba(21, 128, 61, 0.25);
+  --dark-green: #f7f7f6;
+  --orange:     var(--neu-2);
+  --orange-2:   var(--neu-dot);
+
+  /* --- type scale (rem) ------------------------------------------------- */
+  --text-xs:   0.6875rem;   /* 11px */
+  --text-sm:   0.8125rem;   /* 13px */
+  --text-base: 0.9375rem;   /* 15px */
+  --text-lg:   1.0625rem;   /* 17px */
+  --text-xl:   1.375rem;    /* 22px */
+  --text-2xl:  1.875rem;    /* 30px */
+  --text-3xl:  2.5rem;      /* 40px */
+
+  /* --- spacing (8pt grid) ----------------------------------------------- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+
+  /* --- radii ------------------------------------------------------------- */
+  --radius-sm:  4px;
+  --radius:     8px;
+  --radius-lg:  10px;
+  --radius-xl:  14px;
   --radius-pill: 9999px;
 
-  /* --- elevation ------------------------------------------------------- */
-  --elev-1: 0 1px 0 rgba(255,255,255,0.04) inset,
-            0 6px 16px -8px rgba(0,0,0,0.55);
-  --elev-2: 0 1px 0 rgba(255,255,255,0.05) inset,
-            0 14px 36px -16px rgba(0,0,0,0.65),
-            0 4px 12px -6px rgba(0,0,0,0.4);
-  --elev-3: 0 0 0 1px var(--border-strong) inset,
-            0 0 32px -8px var(--lime-glow);
+  /* --- elevation --------------------------------------------------------- */
+  --elev-1: 0 1px 2px rgba(0,0,0,0.05), 0 0 0 1px rgba(0,0,0,0.04);
+  --elev-2: 0 4px 12px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.05);
+  --elev-3: 0 8px 24px rgba(0,0,0,0.09), 0 3px 8px rgba(0,0,0,0.05);
 
-  /* --- motion ---------------------------------------------------------- */
+  /* --- motion ------------------------------------------------------------ */
   --ease-out:    cubic-bezier(0.22, 1, 0.36, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --ease-snap:   cubic-bezier(0.4, 0, 0.2, 1);
-  --dur-fast:   150ms;
-  --dur:        220ms;
-  --dur-slow:   320ms;
+  --dur-fast:   140ms;
+  --dur:        200ms;
+  --dur-slow:   300ms;
 
-  /* --- focus ring ------------------------------------------------------ */
-  --ring-color: color-mix(in oklab, var(--lime) 60%, transparent);
+  /* --- focus ring ------------------------------------------------------- */
+  --ring-color: rgba(21, 128, 61, 0.35);
 }
 
+/* Tailwind theme bridge */
 @theme inline {
   --color-background: var(--background);
   --color-surface:    var(--surface);
@@ -89,15 +114,16 @@
   --color-muted:      var(--muted);
   --color-foreground: var(--foreground);
 
+  --color-pos:  var(--pos);
+  --color-neg:  var(--neg);
+  --color-neu:  var(--neu);
+  --color-info: var(--info);
+
   --color-lime:       var(--lime);
   --color-lime-2:     var(--lime-2);
   --color-dark-green: var(--dark-green);
   --color-orange:     var(--orange);
   --color-orange-2:   var(--orange-2);
-
-  --color-pos: var(--pos);
-  --color-neu: var(--neu);
-  --color-neg: var(--neg);
 
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-jetbrains-mono);
@@ -111,39 +137,21 @@ html, body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), -apple-system, "Noto Sans Thai", sans-serif;
-  font-feature-settings: "tnum" 1, "ss01" 1, "cv02" 1, "cv11" 1;
+  font-feature-settings: "tnum" 1, "ss01" 1;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
 ::selection {
-  background: var(--lime-glow);
-  color: var(--foreground);
+  background: var(--pos-light);
+  color: var(--pos);
 }
-
-/* Layered ambient glow */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(60% 50% at 15% 0%,  rgba(143, 231, 79, 0.10), transparent 60%),
-    radial-gradient(50% 40% at 85% 10%, rgba(242, 107, 44, 0.08), transparent 60%),
-    radial-gradient(40% 50% at 50% 100%, rgba(110, 231, 163, 0.05), transparent 65%);
-  z-index: -1;
-}
-
-/* ============================================================================
-   Focus rings — applied globally for keyboard a11y
-   ============================================================================ */
 
 *:focus { outline: none; }
 *:focus-visible {
   outline: 2px solid var(--ring-color);
   outline-offset: 2px;
   border-radius: var(--radius-sm);
-  transition: outline-offset var(--dur-fast) var(--ease-out);
 }
 
 /* ============================================================================
@@ -151,30 +159,23 @@ body::before {
    ============================================================================ */
 
 .card {
-  background:
-    linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.00)),
-    var(--surface);
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   box-shadow: var(--elev-1);
-  backdrop-filter: blur(8px);
   transition: border-color var(--dur) var(--ease-out),
               box-shadow var(--dur) var(--ease-out),
               transform var(--dur) var(--ease-out);
 }
 
 .card-strong {
-  background:
-    linear-gradient(180deg, rgba(143,231,79,0.05), rgba(143,231,79,0)),
-    var(--surface);
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
   box-shadow: var(--elev-2);
 }
 
-.card-hover {
-  cursor: pointer;
-}
+.card-hover { cursor: pointer; }
 .card-hover:hover {
   border-color: var(--border-strong);
   box-shadow: var(--elev-2);
@@ -186,27 +187,25 @@ body::before {
 }
 
 /* ============================================================================
-   Buttons (utility classes consumed via Tailwind composition)
+   Buttons
    ============================================================================ */
 
 .btn-primary {
-  background: linear-gradient(180deg, var(--lime), color-mix(in oklab, var(--lime) 90%, black));
-  color: var(--dark-green);
-  box-shadow: 0 0 24px -4px var(--lime-glow), inset 0 1px 0 rgba(255,255,255,0.3);
-  transition: filter var(--dur-fast) var(--ease-out),
-              transform var(--dur-fast) var(--ease-out),
-              box-shadow var(--dur) var(--ease-out);
+  background: var(--foreground);
+  color: var(--surface);
+  transition: opacity var(--dur-fast) var(--ease-out),
+              transform var(--dur-fast) var(--ease-out);
 }
-.btn-primary:hover { filter: brightness(1.08); }
-.btn-primary:active { transform: scale(0.97); }
+.btn-primary:hover   { opacity: 0.82; }
+.btn-primary:active  { transform: scale(0.97); }
 .btn-primary:disabled {
-  filter: grayscale(0.4) brightness(0.7);
+  opacity: 0.35;
   cursor: not-allowed;
   transform: none;
 }
 
 /* ============================================================================
-   Slider thumb polish (range inputs)
+   Range slider
    ============================================================================ */
 
 input[type="range"] {
@@ -216,30 +215,29 @@ input[type="range"] {
   cursor: pointer;
 }
 input[type="range"]::-webkit-slider-runnable-track {
-  height: 6px;
+  height: 4px;
   background: linear-gradient(90deg,
-    var(--lime) 0 var(--val, 50%),
+    var(--foreground) 0 var(--val, 50%),
     var(--border) var(--val, 50%) 100%);
   border-radius: var(--radius-pill);
 }
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 18px;
-  height: 18px;
-  background: var(--lime);
-  border: 2px solid var(--dark-green);
+  width: 16px;
+  height: 16px;
+  background: var(--foreground);
+  border: 2px solid var(--surface);
   border-radius: 50%;
-  margin-top: -7px;
-  box-shadow: 0 0 0 4px rgba(143,231,79,0.15);
+  margin-top: -6px;
+  box-shadow: 0 0 0 1px var(--border-strong);
   transition: transform var(--dur-fast) var(--ease-out);
 }
-input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.12); }
+input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
 input[type="range"]::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
-  background: var(--lime);
-  border: 2px solid var(--dark-green);
+  width: 16px; height: 16px;
+  background: var(--foreground);
+  border: 2px solid var(--surface);
   border-radius: 50%;
 }
 
@@ -248,12 +246,11 @@ input[type="range"]::-moz-range-thumb {
    ============================================================================ */
 
 .scroll-y { overflow-y: auto; }
-.scroll-y::-webkit-scrollbar       { width: 8px; height: 8px; }
+.scroll-y::-webkit-scrollbar { width: 6px; height: 6px; }
 .scroll-y::-webkit-scrollbar-track { background: transparent; }
 .scroll-y::-webkit-scrollbar-thumb {
   background: var(--border);
   border-radius: var(--radius-pill);
-  transition: background var(--dur) var(--ease-out);
 }
 .scroll-y::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
 
@@ -262,71 +259,103 @@ input[type="range"]::-moz-range-thumb {
    ============================================================================ */
 
 @keyframes pop {
-  0%   { transform: translateY(6px) scale(0.96); opacity: 0; }
-  60%  { opacity: 1; }
-  100% { transform: translateY(0)   scale(1);    opacity: 1; }
+  0%   { transform: translateY(4px) scale(0.97); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
 }
 .pop { animation: pop var(--dur-slow) var(--ease-spring) both; }
 
 @keyframes shimmer {
   0%   { background-position: -400px 0; }
-  100% { background-position: 400px 0; }
+  100% { background-position:  400px 0; }
 }
 .shimmer {
   background: linear-gradient(90deg,
-    var(--surface) 0%, var(--surface-2) 50%, var(--surface) 100%);
+    var(--surface-2) 0%, var(--surface) 50%, var(--surface-2) 100%);
   background-size: 800px 100%;
   animation: shimmer 1.4s infinite linear;
 }
 
 @keyframes slide-in-up {
-  from { transform: translateY(8px); opacity: 0; }
+  from { transform: translateY(6px); opacity: 0; }
   to   { transform: translateY(0);   opacity: 1; }
 }
 .slide-in { animation: slide-in-up var(--dur) var(--ease-out) both; }
 
-/* Stagger child entries by index via inline `style="--i: 3"` */
 .stagger > * {
   animation: slide-in-up var(--dur) var(--ease-out) both;
   animation-delay: calc(var(--i, 0) * 40ms);
 }
 
 @keyframes pulse-soft {
-  0%, 100% { opacity: 0.6; }
-  50%      { opacity: 1; }
+  0%, 100% { opacity: 0.45; }
+  50%       { opacity: 1; }
 }
-.pulse-soft { animation: pulse-soft 1.6s ease-in-out infinite; }
+.pulse-soft { animation: pulse-soft 1.8s ease-in-out infinite; }
 
 /* ============================================================================
-   Reduced motion — respect user preference
+   Reduced motion
    ============================================================================ */
 
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
   }
 }
 
 /* ============================================================================
-   Utilities
+   Utilities & patterns
    ============================================================================ */
 
 .tabular { font-variant-numeric: tabular-nums; }
+
+/* Section header: "/ LABEL" pattern */
+.slash-label {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.3em;
+}
+.slash-label::before {
+  content: "/";
+  opacity: 0.45;
+  font-weight: 400;
+}
+
+/* Status dot indicator */
+.status-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.status-dot-pos  { background: var(--pos-dot);  }
+.status-dot-neg  { background: var(--neg-dot);  }
+.status-dot-neu  { background: var(--neu-dot);  }
+.status-dot-info { background: var(--info-dot); }
+
+/* Color chips for sentiment / status */
+.chip-pos  { color: var(--pos);  background: var(--pos-light);  }
+.chip-neg  { color: var(--neg);  background: var(--neg-light);  }
+.chip-neu  { color: var(--neu);  background: var(--neu-light);  }
+.chip-info { color: var(--info); background: var(--info-light); }
+
+/* Date input */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: opacity(0.4);
+  cursor: pointer;
+}
+
+/* Gradient text */
 .gradient-text {
-  background: linear-gradient(135deg, var(--lime), var(--lime-2));
+  background: linear-gradient(135deg, var(--foreground), var(--muted));
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-}
-
-/* Native HTML date input — make the picker icon brand-coloured */
-input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(76%) sepia(31%) saturate(720%) hue-rotate(40deg) brightness(106%);
-  opacity: 0.8;
-  cursor: pointer;
 }

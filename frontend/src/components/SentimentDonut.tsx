@@ -11,9 +11,9 @@ export function SentimentDonut({ sentiment, label }: Props) {
   const { t } = useT();
   const total = sentiment.positive + sentiment.neutral + sentiment.negative;
   const data = [
-    { name: t.sentPositive, value: sentiment.positive, color: "var(--pos)" },
-    { name: t.sentNeutral,  value: sentiment.neutral,  color: "var(--neu)" },
-    { name: t.sentNegative, value: sentiment.negative, color: "var(--neg)" },
+    { name: t.sentPositive, value: sentiment.positive, color: "var(--pos-dot)" },
+    { name: t.sentNeutral,  value: sentiment.neutral,  color: "var(--neu-dot)" },
+    { name: t.sentNegative, value: sentiment.negative, color: "var(--neg-dot)" },
   ];
   const posPct = total ? Math.round((sentiment.positive * 100) / total) : 0;
 
@@ -38,10 +38,12 @@ export function SentimentDonut({ sentiment, label }: Props) {
             </Pie>
             <Tooltip
               contentStyle={{
-                background: "var(--surface-2)",
+                background: "var(--surface)",
                 border: "1px solid var(--border)",
-                borderRadius: 12,
+                borderRadius: 8,
                 fontSize: 12,
+                boxShadow: "var(--elev-2)",
+                color: "var(--foreground)",
               }}
             />
           </PieChart>
