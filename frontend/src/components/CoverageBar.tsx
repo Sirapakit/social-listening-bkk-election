@@ -12,9 +12,9 @@ interface Props {
 }
 
 const statusColor: Record<string, string> = {
-  complete: "var(--pos)",
-  sampled:  "var(--orange)",
-  missing:  "var(--muted)",
+  complete: "var(--pos-dot)",
+  sampled:  "var(--neu-dot)",
+  missing:  "var(--neg-dot)",
 };
 
 // statusLabel is now dynamic (see useT inside component)
@@ -222,9 +222,8 @@ function SelectedDayDetail({
             onClick={onDeepScrape}
             className="btn-primary flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-semibold disabled:opacity-60"
             style={{
-              background: "linear-gradient(180deg, var(--orange), color-mix(in oklab, var(--orange) 90%, black))",
-              color: "#1a0a04",
-              boxShadow: "0 0 24px -6px rgba(242, 107, 44, 0.55)",
+              background: "var(--neu-2)",
+              color: "#fff",
             }}
           >
             {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5" />}

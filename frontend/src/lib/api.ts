@@ -4,12 +4,16 @@ import type {
   KeywordSpec,
   PresetsResponse,
 } from "./types";
+import { MOCK_BACKFILL, MOCK_HISTORY, MOCK_PRESETS } from "./mockData";
+
+export const IS_MOCK = process.env.NEXT_PUBLIC_MOCK_DATA === "true";
 
 const BASE =
   process.env.NEXT_PUBLIC_BACKEND_URL?.replace(/\/$/, "") ||
   "http://127.0.0.1:8000";
 
 export async function getPresets(): Promise<PresetsResponse> {
+  if (IS_MOCK) return MOCK_PRESETS;
   const r = await fetch(`${BASE}/api/presets`, { cache: "no-store" });
   if (!r.ok) throw new Error(`presets failed: ${r.status}`);
   return r.json();
@@ -22,6 +26,7 @@ export interface HistoryParams {
 }
 
 export async function getHistory(p: HistoryParams): Promise<HistoryResponse> {
+  if (IS_MOCK) return MOCK_HISTORY;
   const r = await fetch(`${BASE}/api/history`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -38,6 +43,7 @@ export interface BackfillParams extends HistoryParams {
 }
 
 export async function backfill(p: BackfillParams): Promise<BackfillResponse> {
+  if (IS_MOCK) return MOCK_BACKFILL;
   const r = await fetch(`${BASE}/api/backfill`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -52,6 +58,7 @@ export async function scrapeToday(
   keywords: KeywordSpec[],
   cap?: number,
 ): Promise<BackfillResponse> {
+  if (IS_MOCK) return MOCK_BACKFILL;
   const r = await fetch(`${BASE}/api/scrape-today`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -67,6 +74,7 @@ export async function deepScrape(
   day: string,
   per_hour_cap = 500,
 ): Promise<BackfillResponse> {
+  if (IS_MOCK) return MOCK_BACKFILL;
   const r = await fetch(`${BASE}/api/deep-scrape`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

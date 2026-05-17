@@ -14,7 +14,7 @@ export function KeywordPanel({ result }: { result: KeywordResult }) {
     <section
       className="card-strong p-5 flex flex-col gap-4"
       style={{
-        borderColor: `color-mix(in oklab, ${result.color} 30%, var(--border))`,
+        borderTop: `3px solid ${result.color}`,
       }}
     >
       <header className="flex items-center gap-3 pb-2 border-b border-[var(--border)]">

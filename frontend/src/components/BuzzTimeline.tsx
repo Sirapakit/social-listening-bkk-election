@@ -58,10 +58,12 @@ export function BuzzTimeline({ results }: Props) {
             <YAxis stroke="var(--muted)" fontSize={11} width={36} />
             <Tooltip
               contentStyle={{
-                background: "var(--surface-2)",
+                background: "var(--surface)",
                 border: "1px solid var(--border)",
-                borderRadius: 12,
+                borderRadius: 8,
                 fontSize: 12,
+                boxShadow: "var(--elev-2)",
+                color: "var(--foreground)",
               }}
             />
             <Legend

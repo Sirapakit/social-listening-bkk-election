@@ -3,12 +3,11 @@ import { Heart, MessageCircle, Repeat2, ExternalLink, BadgeCheck } from "lucide-
 import { useT } from "@/lib/i18n";
 import { formatNumber } from "@/lib/api";
 import type { KeywordResult } from "@/lib/types";
-import { cn } from "@/lib/utils";
 
-const sentimentChip: Record<string, { label: string; cls: string }> = {
-  positive: { label: "POS", cls: "text-[color:var(--pos)] bg-[color:var(--pos)]/15 border-[color:var(--pos)]/30" },
-  neutral:  { label: "NEU", cls: "text-[color:var(--neu)] bg-[color:var(--neu)]/15 border-[color:var(--neu)]/30" },
-  negative: { label: "NEG", cls: "text-[color:var(--neg)] bg-[color:var(--neg)]/15 border-[color:var(--neg)]/30" },
+const sentimentChip: Record<string, { label: string; bg: string; color: string }> = {
+  positive: { label: "POS", bg: "var(--pos-light)",  color: "var(--pos)" },
+  neutral:  { label: "NEU", bg: "var(--neu-light)",  color: "var(--neu)" },
+  negative: { label: "NEG", bg: "var(--neg-light)",  color: "var(--neg)" },
 };
 
 export function TopPosts({ result }: { result: KeywordResult }) {
@@ -43,17 +42,18 @@ export function TopPosts({ result }: { result: KeywordResult }) {
                 <div className="flex items-center gap-2 mb-1.5">
                   <span className="font-semibold text-sm truncate">{p.author.name || p.author.username}</span>
                   {p.author.verified && (
-                    <BadgeCheck className="w-3.5 h-3.5 text-[color:var(--lime)]" />
+                    <BadgeCheck className="w-3.5 h-3.5" style={{ color: "var(--info)" }} />
                   )}
                   <span className="text-xs text-muted truncate">@{p.author.username}</span>
                   <span className="ml-auto text-[10px] text-muted tabular shrink-0">
                     {formatNumber(p.author.followers)} {t.followersAbbr}
                   </span>
                   <span
-                    className={cn(
-                      "text-[10px] font-semibold font-mono tracking-wider px-1.5 py-0.5 rounded border shrink-0",
-                      chip?.cls,
-                    )}
+                    className="text-[10px] font-semibold font-mono tracking-wider px-1.5 py-0.5 rounded shrink-0"
+                    style={{
+                      color: chip?.color,
+                      background: chip?.bg,
+                    }}
                   >
                     {chip?.label}
                   </span>
