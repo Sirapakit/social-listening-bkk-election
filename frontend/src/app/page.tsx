@@ -1,6 +1,6 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
-import { Activity, AlertCircle, BarChart3, Sparkles, Clock, X } from "lucide-react";
+import { Activity, AlertCircle, BarChart3, Sparkles, X } from "lucide-react";
 import { backfill, getHistory, getPresets, scrapeToday } from "@/lib/api";
 import type { HistoryResponse, KeywordSpec, PresetsResponse } from "@/lib/types";
 import { ControlsBar } from "@/components/ControlsBar";
@@ -132,12 +132,6 @@ function DashboardInner() {
                 {t.loaded} {lastUpdated.toLocaleTimeString("th-TH", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
               </span>
             )}
-            {presets?.schedule.enabled && (
-              <span className="hidden sm:flex items-center gap-1.5 tabular px-2 py-1 rounded-md bg-[var(--surface-2)]/50 border border-[var(--border)]">
-                <Clock className="w-3 h-3" />
-                {t.auto} · {String(presets.schedule.hour).padStart(2, "0")}:{String(presets.schedule.minute).padStart(2, "0")}
-              </span>
-            )}
             {/* Language toggle */}
             <button
               onClick={toggle}
@@ -164,8 +158,6 @@ function DashboardInner() {
             setCap={setCap}
             maxAllowed={presets.max_tweets_per_keyword}
             pricePerTweet={presets.price_per_tweet_usd}
-            scheduleEnabled={presets.schedule.enabled}
-            scheduleHour={presets.schedule.hour}
             onBackfill={onBackfill}
             onScrapeToday={onScrapeToday}
             loadingBackfill={loadingBackfill}

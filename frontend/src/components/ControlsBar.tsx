@@ -20,8 +20,6 @@ interface Props {
   setCap: (n: number) => void;
   maxAllowed: number;
   pricePerTweet: number;
-  scheduleEnabled: boolean;
-  scheduleHour: number;
   onBackfill: () => void;
   onScrapeToday: () => void;
   loadingBackfill: boolean;
@@ -37,7 +35,6 @@ export function ControlsBar(props: Props) {
     endDate, setEndDate,
     cap, setCap,
     maxAllowed, pricePerTweet,
-    scheduleEnabled, scheduleHour,
     onBackfill, onScrapeToday,
     loadingBackfill, loadingToday,
     readonlyMode = false,
@@ -158,12 +155,6 @@ export function ControlsBar(props: Props) {
               highlight
               note={t.idempotent}
             />
-            <CostTile
-              label={t.costDaily}
-              realistic={todayRealistic}
-              max={todayMax}
-              note={scheduleEnabled ? t.scheduleRuns(scheduleHour) : t.scheduleOff}
-            />
           </div>
         </div>
       )}
@@ -193,12 +184,6 @@ export function ControlsBar(props: Props) {
             <span className="text-xs font-mono opacity-80 ml-1">≤ ${backfillMax.toFixed(2)}</span>
           </button>
 
-          <div className="text-[11px] text-muted ml-auto max-w-[280px] text-right leading-snug">
-            {t.autoNote}
-            {scheduleEnabled && (
-              <span className="text-foreground">{t.dailyRefresh(scheduleHour)}</span>
-            )}
-          </div>
         </div>
       )}
     </div>

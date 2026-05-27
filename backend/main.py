@@ -26,7 +26,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 import db
-import scheduler
 import scraper
 from aggregator import aggregate
 from config import (
@@ -37,8 +36,6 @@ from config import (
     MAX_TWEETS_PER_KEYWORD,
     PRICE_PER_TWEET_USD,
     READONLY_MODE,
-    SCRAPE_SCHEDULE_HOUR,
-    SCRAPE_SCHEDULE_MIN,
 )
 
 logging.basicConfig(
@@ -54,9 +51,7 @@ if READONLY_MODE:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     db.init()
-    scheduler.start()
     yield
-    scheduler.shutdown()
 
 
 app = FastAPI(
@@ -185,11 +180,6 @@ async def presets():
         "max_tweets_per_keyword": MAX_TWEETS_PER_KEYWORD,
         "price_per_tweet_usd": PRICE_PER_TWEET_USD,
         "readonly_mode": READONLY_MODE,
-        "schedule": {
-            "hour": SCRAPE_SCHEDULE_HOUR,
-            "minute": SCRAPE_SCHEDULE_MIN,
-            "enabled": SCRAPE_SCHEDULE_HOUR >= 0 and not READONLY_MODE,
-        },
     }
 
 

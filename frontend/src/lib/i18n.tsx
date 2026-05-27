@@ -10,7 +10,6 @@ const th = {
   // Header
   subtitle:       "2026 · กระแสทวีต, การเข้าถึง & ความรู้สึก",
   loaded:         "โหลดเมื่อ",
-  auto:           "อัตโนมัติ",
 
   // Missing-days toast
   missingDays:      (n: number) => `ขาดข้อมูล ${n} วัน —`,
@@ -47,15 +46,10 @@ const th = {
   perTweet:         (n: number) => `· $${n.toFixed(5)} ต่อทวีต`,
   costPerDay:       "ต่อวัน (วันนี้)",
   costBackfill:     (n: number) => `เติมข้อมูล ${n} วัน`,
-  costDaily:        "ดึงข้อมูลอัตโนมัติ",
   capNote:          (kw: number, cap: number) => `${kw} คีย์เวิร์ด × ${cap.toLocaleString()} ทวีต`,
   idempotent:       "วันที่ดึงแล้วไม่คิดค่าใช้จ่าย",
-  scheduleRuns:     (h: number) => `ทำงานทุกวันเวลา ${String(h).padStart(2, "0")}:00`,
-  scheduleOff:      "ปิดการกำหนดเวลา",
   scrapeTodayBtn:   "ดึงข้อมูลวันนี้",
   backfillBtn:      (n: number) => `เติมข้อมูล ${n} วัน`,
-  autoNote:         "เปิดหน้าจะดึงข้อมูลใหม่อัตโนมัติ วันที่ขาดจะดึงเมื่อเปิดเว็บ",
-  dailyRefresh:     (h: number) => ` รีเฟรชรายวันเวลา ${String(h).padStart(2, "0")}:00`,
 
   // CoverageBar
   coverageTitle:    "ความครอบคลุม",
@@ -111,7 +105,6 @@ const en: typeof th = {
 
   subtitle:      "2026 · X.com buzz, reach & sentiment",
   loaded:        "Loaded",
-  auto:          "Auto",
 
   missingDays:      (n) => `${n} day${n === 1 ? "" : "s"} missing across keywords —`,
   missingDaysHint:  "click Backfill to fetch (idempotent).",
@@ -142,15 +135,10 @@ const en: typeof th = {
   perTweet:         (n) => `· $${n.toFixed(5)} per tweet`,
   costPerDay:       "Per day (Scrape today)",
   costBackfill:     (n) => `Backfill ${n} day${n === 1 ? "" : "s"}`,
-  costDaily:        "Daily auto-scrape",
   capNote:          (kw, cap) => `${kw} keywords × ${cap.toLocaleString()} cap`,
   idempotent:       "Idempotent — already-scraped days are free.",
-  scheduleRuns:     (h) => `Runs at ${String(h).padStart(2, "0")}:00 every day`,
-  scheduleOff:      "Schedule disabled",
   scrapeTodayBtn:   "Scrape today",
   backfillBtn:      (n) => `Backfill ${n} day${n === 1 ? "" : "s"}`,
-  autoNote:         "Opens to fresh data automatically. Missing days are scraped on visit.",
-  dailyRefresh:     (h) => ` Daily refresh at ${String(h).padStart(2, "0")}:00.`,
 
   coverageTitle:    "Coverage",
   clickForDetails:  "click a day for details",

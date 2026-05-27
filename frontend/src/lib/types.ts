@@ -110,7 +110,6 @@ export interface PresetsResponse {
   max_tweets_per_keyword: number;
   price_per_tweet_usd: number;
   readonly_mode: boolean;
-  schedule: { hour: number; minute: number; enabled: boolean };
 }
 
 export interface BackfillSummary {
