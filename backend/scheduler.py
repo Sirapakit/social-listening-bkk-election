@@ -17,6 +17,7 @@ import scraper
 from config import (
     CANDIDATE_PRESETS,
     MAX_TWEETS_PER_KEYWORD,
+    READONLY_MODE,
     SCRAPE_SCHEDULE_HOUR,
     SCRAPE_SCHEDULE_MIN,
 )
@@ -48,6 +49,9 @@ async def _scrape_all_today() -> None:
 def start() -> None:
     global _scheduler
     if _scheduler is not None:
+        return
+    if READONLY_MODE:
+        logger.info("READONLY_MODE=true → daily scrape scheduler disabled")
         return
     if SCRAPE_SCHEDULE_HOUR < 0:
         logger.info("SCRAPE_SCHEDULE_HOUR=-1 → daily scrape disabled")

@@ -1,0 +1,14 @@
+# Dependencies (installed fresh inside image)
+node_modules/
+
+# Build output (built inside image)
+.next/
+
+# Secrets
+.env
+.env.local
+.env.*.local
+
+# Dev / editor
+.DS_Store
+*.tsbuildinfo

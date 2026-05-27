@@ -9,6 +9,7 @@ interface Props {
   coverage: Record<string, KeywordCoverage>;
   keywords: KeywordSpec[];
   onRefetch: () => void;
+  readonlyMode?: boolean;
 }
 
 const statusColor: Record<string, string> = {
@@ -19,7 +20,7 @@ const statusColor: Record<string, string> = {
 
 // statusLabel is now dynamic (see useT inside component)
 
-export function CoverageBar({ coverage, keywords, onRefetch }: Props) {
+export function CoverageBar({ coverage, keywords, onRefetch, readonlyMode = false }: Props) {
   const { t } = useT();
   const statusLabel: Record<string, string> = {
     complete: t.statusComplete,
@@ -147,6 +148,7 @@ export function CoverageBar({ coverage, keywords, onRefetch }: Props) {
           busy={busy === `${selected.key}-${selected.day.day}`}
           onDeepScrape={() => handleDeepScrape(selected.key, selected.day.day)}
           onClose={() => setSelected(null)}
+          readonlyMode={readonlyMode}
         />
       )}
     </div>
@@ -154,7 +156,7 @@ export function CoverageBar({ coverage, keywords, onRefetch }: Props) {
 }
 
 function SelectedDayDetail({
-  day, keywordKey, statusLabel, busy, onDeepScrape, onClose,
+  day, keywordKey, statusLabel, busy, onDeepScrape, onClose, readonlyMode = false,
 }: {
   day: DayCoverage;
   keywordKey: string;
@@ -162,6 +164,7 @@ function SelectedDayDetail({
   busy: boolean;
   onDeepScrape: () => void;
   onClose: () => void;
+  readonlyMode?: boolean;
 }) {
   const { t } = useT();
   const deepCost = 24 * 500 * 0.00025;
@@ -215,7 +218,7 @@ function SelectedDayDetail({
         </button>
       </div>
 
-      {day.hit_cap && (
+      {day.hit_cap && !readonlyMode && (
         <div className="mt-4 flex items-center gap-3 flex-wrap">
           <button
             disabled={busy}

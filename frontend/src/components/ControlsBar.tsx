@@ -26,6 +26,7 @@ interface Props {
   onScrapeToday: () => void;
   loadingBackfill: boolean;
   loadingToday: boolean;
+  readonlyMode?: boolean;
 }
 
 export function ControlsBar(props: Props) {
@@ -39,6 +40,7 @@ export function ControlsBar(props: Props) {
     scheduleEnabled, scheduleHour,
     onBackfill, onScrapeToday,
     loadingBackfill, loadingToday,
+    readonlyMode = false,
   } = props;
 
   const updateQuery = (i: number, q: string) => {
@@ -132,69 +134,73 @@ export function ControlsBar(props: Props) {
         </div>
       </div>
 
-      {/* Cost preview card */}
-      <div className="rounded-xl border border-[var(--border)] bg-gradient-to-br from-[var(--surface-2)]/60 to-[var(--surface)]/60 p-4">
-        <div className="text-[var(--text-xs)] uppercase tracking-wider text-muted font-medium mb-3 flex items-center gap-2">
-          <Zap className="w-3 h-3 text-[color:var(--lime)]" />
-          {t.costPreview}
-          <span className="opacity-50 normal-case tracking-normal">
-            {t.perTweet(pricePerTweet)}
-          </span>
+      {/* Cost preview card — hidden in readonly mode */}
+      {!readonlyMode && (
+        <div className="rounded-xl border border-[var(--border)] bg-gradient-to-br from-[var(--surface-2)]/60 to-[var(--surface)]/60 p-4">
+          <div className="text-[var(--text-xs)] uppercase tracking-wider text-muted font-medium mb-3 flex items-center gap-2">
+            <Zap className="w-3 h-3 text-[color:var(--lime)]" />
+            {t.costPreview}
+            <span className="opacity-50 normal-case tracking-normal">
+              {t.perTweet(pricePerTweet)}
+            </span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <CostTile
+              label={t.costPerDay}
+              realistic={todayRealistic}
+              max={todayMax}
+              note={t.capNote(keywords.length, cap)}
+            />
+            <CostTile
+              label={t.costBackfill(days)}
+              realistic={backfillRealistic}
+              max={backfillMax}
+              highlight
+              note={t.idempotent}
+            />
+            <CostTile
+              label={t.costDaily}
+              realistic={todayRealistic}
+              max={todayMax}
+              note={scheduleEnabled ? t.scheduleRuns(scheduleHour) : t.scheduleOff}
+            />
+          </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <CostTile
-            label={t.costPerDay}
-            realistic={todayRealistic}
-            max={todayMax}
-            note={t.capNote(keywords.length, cap)}
-          />
-          <CostTile
-            label={t.costBackfill(days)}
-            realistic={backfillRealistic}
-            max={backfillMax}
-            highlight
-            note={t.idempotent}
-          />
-          <CostTile
-            label={t.costDaily}
-            realistic={todayRealistic}
-            max={todayMax}
-            note={scheduleEnabled ? t.scheduleRuns(scheduleHour) : t.scheduleOff}
-          />
+      )}
+
+      {/* Action buttons — hidden in readonly mode */}
+      {!readonlyMode && (
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            onClick={onScrapeToday}
+            disabled={loadingToday || loadingBackfill}
+            title={`${t.scrapeTodayBtn} (${keywords.length} keywords) — max $${todayMax.toFixed(2)}`}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-lg font-semibold border border-[var(--border-strong)] bg-[var(--surface-2)]/40 hover:bg-[var(--surface-2)] hover:border-[var(--lime)]/40 disabled:opacity-50 disabled:cursor-not-allowed transition"
+          >
+            {loadingToday ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+            {t.scrapeTodayBtn}
+            <span className="text-xs text-muted font-mono ml-1">~${todayRealistic.toFixed(2)}</span>
+          </button>
+
+          <button
+            onClick={onBackfill}
+            disabled={loadingBackfill || loadingToday || days === 0}
+            title={`${t.backfillBtn(days)} — max $${backfillMax.toFixed(2)}`}
+            className="btn-primary flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold"
+          >
+            {loadingBackfill ? <Loader2 className="w-4 h-4 animate-spin" /> : <Database className="w-4 h-4" />}
+            {t.backfillBtn(days)}
+            <span className="text-xs font-mono opacity-80 ml-1">≤ ${backfillMax.toFixed(2)}</span>
+          </button>
+
+          <div className="text-[11px] text-muted ml-auto max-w-[280px] text-right leading-snug">
+            {t.autoNote}
+            {scheduleEnabled && (
+              <span className="text-foreground">{t.dailyRefresh(scheduleHour)}</span>
+            )}
+          </div>
         </div>
-      </div>
-
-      {/* Action buttons */}
-      <div className="flex flex-wrap items-center gap-3">
-        <button
-          onClick={onScrapeToday}
-          disabled={loadingToday || loadingBackfill}
-          title={`${t.scrapeTodayBtn} (${keywords.length} keywords) — max $${todayMax.toFixed(2)}`}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-lg font-semibold border border-[var(--border-strong)] bg-[var(--surface-2)]/40 hover:bg-[var(--surface-2)] hover:border-[var(--lime)]/40 disabled:opacity-50 disabled:cursor-not-allowed transition"
-        >
-          {loadingToday ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-          {t.scrapeTodayBtn}
-          <span className="text-xs text-muted font-mono ml-1">~${todayRealistic.toFixed(2)}</span>
-        </button>
-
-        <button
-          onClick={onBackfill}
-          disabled={loadingBackfill || loadingToday || days === 0}
-          title={`${t.backfillBtn(days)} — max $${backfillMax.toFixed(2)}`}
-          className="btn-primary flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold"
-        >
-          {loadingBackfill ? <Loader2 className="w-4 h-4 animate-spin" /> : <Database className="w-4 h-4" />}
-          {t.backfillBtn(days)}
-          <span className="text-xs font-mono opacity-80 ml-1">≤ ${backfillMax.toFixed(2)}</span>
-        </button>
-
-        <div className="text-[11px] text-muted ml-auto max-w-[280px] text-right leading-snug">
-          {t.autoNote}
-          {scheduleEnabled && (
-            <span className="text-foreground">{t.dailyRefresh(scheduleHour)}</span>
-          )}
-        </div>
-      </div>
+      )}
     </div>
   );
 }

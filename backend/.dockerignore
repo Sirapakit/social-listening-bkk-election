@@ -1,0 +1,18 @@
+# Virtual environment
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Database files (persisted via Docker volume, not baked into image)
+data/*.db
+data/*.db-shm
+data/*.db-wal
+
+# Secrets
+.env
+
+# Dev / editor
+.DS_Store
+*.egg-info/
+.pytest_cache/

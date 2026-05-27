@@ -21,7 +21,7 @@ from datetime import date
 from typing import Any
 
 import httpx
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
@@ -36,6 +36,7 @@ from config import (
     DEFAULT_START_DATE,
     MAX_TWEETS_PER_KEYWORD,
     PRICE_PER_TWEET_USD,
+    READONLY_MODE,
     SCRAPE_SCHEDULE_HOUR,
     SCRAPE_SCHEDULE_MIN,
 )
@@ -45,6 +46,9 @@ logging.basicConfig(
     format="%(asctime)s %(levelname)s %(name)s %(message)s",
 )
 logger = logging.getLogger("dashboard")
+
+if READONLY_MODE:
+    logger.info("READONLY_MODE=true — all scraping endpoints are disabled")
 
 
 @asynccontextmanager
@@ -64,10 +68,21 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     # Allow any localhost port — dev preview servers sometimes pick a fresh one.
-    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$",
+    # Also allow any origin for Docker deployments behind a reverse proxy.
+    allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# --- read-only guard ---------------------------------------------------------
+async def require_write_mode() -> None:
+    """FastAPI dependency: raises 403 when READONLY_MODE=true."""
+    if READONLY_MODE:
+        raise HTTPException(
+            status_code=403,
+            detail="Read-only mode — scraping is disabled on this instance.",
+        )
 
 
 # --- models ------------------------------------------------------------------
@@ -158,7 +173,7 @@ def _coverage_block(keyword_key: str, start: str, end: str) -> dict:
 # --- routes ------------------------------------------------------------------
 @app.get("/api/health")
 async def health():
-    return {"status": "ok"}
+    return {"status": "ok", "readonly": READONLY_MODE}
 
 
 @app.get("/api/presets")
@@ -169,10 +184,11 @@ async def presets():
         "today": date.today().isoformat(),
         "max_tweets_per_keyword": MAX_TWEETS_PER_KEYWORD,
         "price_per_tweet_usd": PRICE_PER_TWEET_USD,
+        "readonly_mode": READONLY_MODE,
         "schedule": {
             "hour": SCRAPE_SCHEDULE_HOUR,
             "minute": SCRAPE_SCHEDULE_MIN,
-            "enabled": SCRAPE_SCHEDULE_HOUR >= 0,
+            "enabled": SCRAPE_SCHEDULE_HOUR >= 0 and not READONLY_MODE,
         },
     }
 
@@ -197,7 +213,7 @@ async def coverage_endpoint(keyword: str, start: str, end: str):
     return _coverage_block(keyword, start, end)
 
 
-@app.post("/api/backfill")
+@app.post("/api/backfill", dependencies=[Depends(require_write_mode)])
 async def backfill(req: BackfillRequest):
     cap = req.cap or MAX_TWEETS_PER_KEYWORD
     summaries = []
@@ -221,7 +237,7 @@ async def backfill(req: BackfillRequest):
     }
 
 
-@app.post("/api/scrape-today")
+@app.post("/api/scrape-today", dependencies=[Depends(require_write_mode)])
 async def scrape_today(req: ScrapeTodayRequest):
     cap = req.cap or MAX_TWEETS_PER_KEYWORD
     today = date.today().isoformat()
@@ -240,7 +256,7 @@ async def scrape_today(req: ScrapeTodayRequest):
     }
 
 
-@app.post("/api/deep-scrape")
+@app.post("/api/deep-scrape", dependencies=[Depends(require_write_mode)])
 async def deep_scrape(req: DeepScrapeRequest):
     summaries = []
     for spec in req.keywords:

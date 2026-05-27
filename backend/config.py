@@ -25,6 +25,11 @@ PRICE_PER_TWEET_USD: float = float(os.getenv("PRICE_PER_TWEET_USD", "0.00025"))
 SCRAPE_SCHEDULE_HOUR: int = int(os.getenv("SCRAPE_SCHEDULE_HOUR", "12"))
 SCRAPE_SCHEDULE_MIN: int = int(os.getenv("SCRAPE_SCHEDULE_MIN", "0"))
 
+# Read-only mode: disables all scraping endpoints and the scheduler.
+# Set READONLY_MODE=true to let external users view the dashboard without
+# being able to trigger Apify runs (no API token required in this mode).
+READONLY_MODE: bool = os.getenv("READONLY_MODE", "false").lower() == "true"
+
 
 # Pre-defined candidate keyword bundles. The frontend will use these by default
 # but the API accepts any string, so users can edit on the fly.

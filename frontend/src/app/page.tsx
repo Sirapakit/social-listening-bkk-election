@@ -63,10 +63,12 @@ function DashboardInner() {
 
   useEffect(() => { refetchHistory(); }, [refetchHistory]);
 
+  const readonlyMode = presets?.readonly_mode ?? false;
+
   const missingDayCount = data
     ? Object.values(data.coverage).reduce((s, c) => s + c.totals.missing, 0)
     : 0;
-  const showToast = missingDayCount > 0 && !toastDismissed && !loadingBackfill;
+  const showToast = missingDayCount > 0 && !toastDismissed && !loadingBackfill && !readonlyMode;
 
   const onBackfill = async () => {
     setLoadingBackfill(true);
@@ -168,6 +170,7 @@ function DashboardInner() {
             onScrapeToday={onScrapeToday}
             loadingBackfill={loadingBackfill}
             loadingToday={loadingToday}
+            readonlyMode={readonlyMode}
           />
         ) : (
           <div className="card shimmer h-[320px]" />
@@ -241,7 +244,7 @@ function DashboardInner() {
         )}
 
         {/* ============== Coverage ============== */}
-        {data && ready && <CoverageBar coverage={data.coverage} keywords={keywords} onRefetch={refetchHistory} />}
+        {data && ready && <CoverageBar coverage={data.coverage} keywords={keywords} onRefetch={refetchHistory} readonlyMode={readonlyMode} />}
 
         {/* ============== Empty data ============== */}
         {!loadingBackfill && data && !hasData && (

@@ -1,0 +1,40 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      - APIFY_API_TOKEN=${APIFY_API_TOKEN:-}
+      - READONLY_MODE=${READONLY_MODE:-false}
+      - MAX_TWEETS_PER_KEYWORD=${MAX_TWEETS_PER_KEYWORD:-2000}
+      - SCRAPE_SCHEDULE_HOUR=${SCRAPE_SCHEDULE_HOUR:-12}
+      - SCRAPE_SCHEDULE_MIN=${SCRAPE_SCHEDULE_MIN:-0}
+      - DEFAULT_START_DATE=${DEFAULT_START_DATE:-2026-05-01}
+      - PRICE_PER_TWEET_USD=${PRICE_PER_TWEET_USD:-0.00025}
+      # Bind to all interfaces inside the container
+      - BACKEND_HOST=0.0.0.0
+    volumes:
+      # Named volume keeps SQLite data across container restarts and updates
+      - db_data:/app/data
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        # Browser makes API calls directly to this URL — must be reachable
+        # from the end user's machine, not from inside Docker.
+        # For local deployments: http://localhost:8000 (default)
+        # For remote servers:   http://<server-ip>:8000
+        NEXT_PUBLIC_BACKEND_URL: ${NEXT_PUBLIC_BACKEND_URL:-http://localhost:8000}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  db_data:
+    # docker compose down        → keeps the volume (data safe)
+    # docker compose down -v     → removes the volume (clean slate)
