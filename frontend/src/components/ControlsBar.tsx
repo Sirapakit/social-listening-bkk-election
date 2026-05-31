@@ -74,7 +74,7 @@ export function ControlsBar(props: Props) {
                 value={k.query}
                 onChange={(e) => updateQuery(i, e.target.value)}
                 placeholder={t.queryPlaceholder}
-                className="w-full bg-[var(--surface-2)]/60 border border-[var(--border)] rounded-lg pl-9 pr-3 py-2 text-sm font-mono focus:border-[var(--lime)]/50 transition"
+                className="w-full bg-[var(--surface-2)] border border-[var(--border)] rounded-lg pl-9 pr-3 py-2 text-sm font-mono focus:border-[var(--border-strong)] transition"
               />
             </div>
           </div>
@@ -125,7 +125,7 @@ export function ControlsBar(props: Props) {
               onChange={(e) =>
                 setCap(Math.max(100, Math.min(maxAllowed, Number(e.target.value) || 100)))
               }
-              className="w-20 bg-[var(--surface-2)]/60 border border-[var(--border)] rounded-lg px-2 py-1.5 text-sm tabular text-right focus:border-[var(--lime)]/50 transition"
+              className="w-20 bg-[var(--surface-2)] border border-[var(--border)] rounded-lg px-2 py-1.5 text-sm tabular text-right focus:border-[var(--border-strong)] transition"
             />
           </div>
         </div>
@@ -208,7 +208,7 @@ function DateField({
         type="date"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="bg-[var(--surface-2)]/60 border border-[var(--border)] rounded-lg px-3 py-2 text-sm tabular focus:border-[var(--lime)]/50 transition"
+        className="bg-[var(--surface-2)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm tabular focus:border-[var(--border-strong)] transition"
       />
     </div>
   );
@@ -227,14 +227,15 @@ function CostTile({
     <div
       className={`rounded-lg p-3 border ${
         highlight
-          ? "bg-[color:var(--lime)]/5 border-[color:var(--lime)]/25"
-          : "bg-[var(--surface)]/40 border-[var(--border)]"
+          ? "bg-[var(--surface-2)] border-[var(--border-strong)]"
+          : "bg-[var(--surface-2)] border-[var(--border)]"
       }`}
     >
       <div className="text-[11px] text-muted">{label}</div>
       <div className="flex items-baseline gap-2 tabular mt-0.5">
         <span
-          className={`text-xl font-bold ${highlight ? "text-[color:var(--lime)]" : "text-foreground"}`}
+          className="text-xl font-bold"
+          style={{ color: highlight ? "var(--pos)" : "var(--foreground)" }}
         >
           ${realistic.toFixed(2)}
         </span>
