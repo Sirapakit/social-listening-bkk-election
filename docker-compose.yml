@@ -28,7 +28,9 @@ services:
         # For remote servers:   http://<your-server-ip>:8000
         NEXT_PUBLIC_BACKEND_URL: ${NEXT_PUBLIC_BACKEND_URL:-http://localhost:8000}
     ports:
-      - "3000:3000"
+      # Host port is overridable (default 3000). Set FRONTEND_PORT to avoid
+      # collisions with other local containers, e.g. FRONTEND_PORT=3001.
+      - "${FRONTEND_PORT:-3000}:3000"
     depends_on:
       - backend
     restart: unless-stopped

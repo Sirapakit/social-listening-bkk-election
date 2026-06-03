@@ -32,12 +32,8 @@ cd frontend && npm run dev
 
 ## 2. ส่งให้คนอื่น Deploy (ห้ามให้ Token หลุด)
 
-ส่ง 2 อย่าง ไม่ต้องส่ง `.env` หรือ API token:
-
-| อะไร | วิธีส่ง |
-|---|---|
-| Repo | https://github.com/Sirapakit/social-listening-bkk-election |
-| Database | `backend/data/snapshots.db` → Google Drive / WeTransfer |
+Database แนบมาในตัว repo แล้ว — เป็น **seed บีบอัด** ที่ `backend/seed/snapshots.db.gz`
+(มีแต่ทวีตสาธารณะ ไม่มี token/secret). ส่งแค่ลิงก์ repo อย่างเดียว ไม่ต้องส่งไฟล์แยก ไม่ต้องส่ง `.env`
 
 **คนรับทำ:**
 
@@ -45,17 +41,25 @@ cd frontend && npm run dev
 git clone https://github.com/Sirapakit/social-listening-bkk-election.git
 cd social-listening-bkk-election
 
-# วาง database ที่ได้รับมา
-mkdir -p backend/data
-cp ~/Downloads/snapshots.db backend/data/
+# คลาย seed → backend/data/snapshots.db
+python3 scripts/restore_snapshot.py
+# (ถ้าไม่มี python: gunzip -c backend/seed/snapshots.db.gz > backend/data/snapshots.db)
 
-# ตั้ง readonly mode — ไม่ต้องมี API token เลย
+# readonly mode — ไม่ต้องมี API token เลย
 echo "READONLY_MODE=true" > .env
 
 docker compose up --build
 ```
 
 เปิด http://localhost:3000 → ดูข้อมูลได้ ปุ่ม scrape ทุกปุ่มหายหมด
+
+> 🔄 **อัปเดตข้อมูล (เจ้าของ repo):** หลัง scrape เสร็จ ทำ 3 ขั้น
+> ```bash
+> .venv/bin/python scripts/export_snapshot.py     # บีบ DB → backend/seed/snapshots.db.gz
+> git add backend/seed/snapshots.db.gz
+> git commit -m "data: refresh snapshot" && git push
+> ```
+> ฝั่งคนรับแค่ `git pull` แล้ว `python3 scripts/restore_snapshot.py --force` ก็ได้ข้อมูลใหม่
 
 ---
 

@@ -20,7 +20,7 @@ export const MOCK_PRESETS: PresetsResponse = {
   today: "2026-05-17",
   max_tweets_per_keyword: 2000,
   price_per_tweet_usd: 0.00025,
-  schedule: { hour: 12, minute: 0, enabled: true },
+  readonly_mode: false,
 };
 
 // Deterministic daily tweet counts per keyword (17 days: May 1–17)
