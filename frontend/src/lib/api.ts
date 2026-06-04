@@ -8,9 +8,7 @@ import { MOCK_BACKFILL, MOCK_HISTORY, MOCK_PRESETS } from "./mockData";
 
 export const IS_MOCK = process.env.NEXT_PUBLIC_MOCK_DATA === "true";
 
-const BASE =
-  process.env.NEXT_PUBLIC_BACKEND_URL?.replace(/\/$/, "") ||
-  "http://127.0.0.1:8000";
+const BASE = "";
 
 export async function getPresets(): Promise<PresetsResponse> {
   if (IS_MOCK) return MOCK_PRESETS;

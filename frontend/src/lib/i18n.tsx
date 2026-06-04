@@ -68,7 +68,7 @@ const th = {
   totalTweets:  (n: number) => `${n.toLocaleString()} ทวีตทั้งหมด`,
 
   // BuzzTimeline
-  buzzTitle:    "กระแสตามเวลา",
+  buzzTitle:    "กระแสตามช่วงวัน",
   tweetsPerDay: "ทวีตต่อวัน",
 
   // TopPosts

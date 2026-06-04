@@ -13,7 +13,7 @@ docker compose up --build
 ```
 
 - Frontend → http://localhost:3000
-- Backend → http://localhost:8000
+- Backend → http://localhost:8001
 - Database อยู่ที่ `backend/data/snapshots.db` บน host ตรงๆ ไม่หายเมื่อ restart
 
 **แบบ Dev** (แก้ code แล้วเห็นทันที)

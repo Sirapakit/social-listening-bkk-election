@@ -65,79 +65,118 @@ export function CoverageBar({ coverage, keywords, onRefetch, readonlyMode = fals
         </div>
       </div>
 
-      <div className="flex flex-col gap-2.5">
-        {keywords.map((k) => {
-          const c = coverage[k.key];
-          if (!c) return null;
-          return (
-            <div key={k.key} className="flex items-center gap-3">
-              <div className="w-36 shrink-0 flex items-center gap-2 text-sm">
+      {/* Unified scrollable days grid with fixed label and totals columns */}
+      <div className="w-full">
+        <div className="flex items-start">
+          {/* Labels column */}
+          <div className="w-36 shrink-0 flex flex-col gap-2">
+            {keywords.map((k) => (
+              <div key={k.key} className="flex items-center gap-2 text-sm min-h-[36px]">
                 <span
                   className="w-2.5 h-2.5 rounded-full"
                   style={{ background: k.color, boxShadow: `0 0 8px ${k.color}` }}
                 />
                 <span className="truncate font-medium">{k.label}</span>
               </div>
-              <div className="flex gap-[3px] flex-1 min-w-0">
-                {c.days.map((d) => {
-                  const busyKey = `${k.key}-${d.day}`;
-                  const isBusy = busy === busyKey;
-                  const isSelected =
-                    selected?.key === k.key && selected.day.day === d.day;
-                  const dayNum = parseInt(d.day.slice(-2), 10);
-                  return (
-                    <button
-                      key={d.day}
-                      aria-label={`${k.label} on ${d.day}: ${statusLabel[d.status]} (${d.tweets} tweets)`}
-                      title={
-                        d.status === "missing"
-                          ? `${d.day} — no data yet`
-                          : `${d.day} — ${d.tweets} tweets · $${d.cost.toFixed(4)}${
-                              d.hit_cap ? " · sampled (hit cap)" : ""
-                            }`
-                      }
-                      onClick={() => setSelected({ key: k.key, day: d })}
-                      className="flex-1 h-9 rounded-[6px] flex items-center justify-center font-mono text-[11px] tabular relative transition-all cursor-pointer focus-visible:scale-110"
-                      style={{
-                        background: `color-mix(in oklab, ${statusColor[d.status]} ${
-                          d.status === "missing" ? "12%" : "32%"
-                        }, transparent)`,
-                        border: `1px solid ${
-                          isSelected
-                            ? "var(--lime)"
-                            : `color-mix(in oklab, ${statusColor[d.status]} 60%, transparent)`
-                        }`,
-                        color: statusColor[d.status],
-                        transform: isSelected ? "translateY(-1px)" : undefined,
-                        boxShadow: isSelected
-                          ? `0 0 0 2px var(--lime), 0 0 14px -2px var(--lime-glow)`
-                          : undefined,
-                      }}
-                    >
-                      {isBusy ? (
-                        <Loader2 className="w-3 h-3 animate-spin" />
-                      ) : (
-                        <span className="font-semibold">{dayNum || "—"}</span>
-                      )}
-                      {d.status === "sampled" && !isBusy && (
-                        <AlertTriangle
-                          className="absolute top-0.5 right-0.5 w-2 h-2"
-                          style={{ color: statusColor.sampled }}
-                        />
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-              <div className="w-36 shrink-0 text-right text-[11px] text-muted tabular">
-                <span className="text-foreground font-medium">
-                  {c.totals.tweets.toLocaleString()}
-                </span>{" "}
-                {t.tweetsWord} · ${c.totals.cost_usd.toFixed(2)}
-              </div>
-            </div>
-          );
-        })}
+            ))}
+          </div>
+
+          {/* Shared scroll area for all day cells */}
+          <div className="flex-1 overflow-x-auto">
+            {/** compute dates from first available coverage row */}
+            {(() => {
+              const firstKey = keywords.find((k) => coverage[k.key])?.key;
+              const dates = firstKey ? coverage[firstKey].days.map((d) => d.day) : [];
+              const cellWidth = 52; // px
+              return (
+                <div style={{ minWidth: `${Math.max(0, dates.length * cellWidth)}px` }}>
+                  {keywords.map((k) => {
+                    const c = coverage[k.key];
+                    return (
+                      <div
+                        key={k.key}
+                        className="grid items-center"
+                        style={{
+                          gridTemplateColumns: `repeat(${dates.length}, ${cellWidth}px)`,
+                          display: "grid",
+                          gap: "8px",
+                          alignItems: "center",
+                          marginBottom: "8px",
+                        }}
+                      >
+                        {dates.map((dayStr, idx) => {
+                          const d = c?.days[idx] ?? { day: dayStr, status: "missing", tweets: 0, hit_cap: false, cost: 0 } as any;
+                          const busyKey = `${k.key}-${d.day}`;
+                          const isBusy = busy === busyKey;
+                          const isSelected = selected?.key === k.key && selected.day.day === d.day;
+                          const dayNum = parseInt(d.day.slice(-2), 10);
+                          return (
+                            <button
+                              key={d.day}
+                              aria-label={`${k.label} on ${d.day}: ${statusLabel[d.status]} (${d.tweets} tweets)`}
+                              title={
+                                d.status === "missing"
+                                  ? `${d.day} — no data yet`
+                                  : `${d.day} — ${d.tweets} tweets${
+                                      d.hit_cap ? " · sampled (hit cap)" : ""
+                                    }`
+                              }
+                              onClick={() => setSelected({ key: k.key, day: d })}
+                              className="h-9 rounded-[6px] flex items-center justify-center font-mono text-[11px] tabular relative transition-all cursor-pointer"
+                              style={{
+                                width: `${cellWidth}px`,
+                                background: `color-mix(in oklab, ${statusColor[d.status]} ${
+                                  d.status === "missing" ? "12%" : "32%"
+                                }, transparent)`,
+                                border: `1px solid ${
+                                  isSelected
+                                    ? "var(--lime)"
+                                    : `color-mix(in oklab, ${statusColor[d.status]} 60%, transparent)`
+                                }`,
+                                color: statusColor[d.status],
+                                transform: isSelected ? "translateY(-1px)" : undefined,
+                                boxShadow: isSelected
+                                  ? `0 0 0 2px var(--lime), 0 0 14px -2px var(--lime-glow)`
+                                  : undefined,
+                              }}
+                            >
+                              {isBusy ? (
+                                <Loader2 className="w-3 h-3 animate-spin" />
+                              ) : (
+                                <span className="font-semibold">{dayNum || "—"}</span>
+                              )}
+                              {d.status === "sampled" && !isBusy && (
+                                <AlertTriangle
+                                  className="absolute top-0.5 right-0.5 w-2 h-2"
+                                  style={{ color: statusColor.sampled }}
+                                />
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })()}
+          </div>
+
+          {/* Totals column aligned with labels */}
+          <div className="w-36 shrink-0 flex flex-col gap-2 text-right text-[11px] text-muted tabular">
+            {keywords.map((k) => {
+              const c = coverage[k.key];
+              return (
+                <div key={k.key} className="min-h-[36px] flex items-center justify-end">
+                  <div>
+                    <div className="text-foreground font-medium">{c ? c.totals.tweets.toLocaleString() : "—"}</div>
+                    <div className="text-xs text-muted">{t.tweetsWord}</div> 
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
       {selected && (
@@ -204,7 +243,7 @@ function SelectedDayDetail({
               <>{t.noDataDay} <span className="text-foreground">{t.useBackfill}</span></>
             ) : (
               <>
-                {day.tweets.toLocaleString()} {t.tweetsWord} · ${day.cost.toFixed(4)}
+                {day.tweets.toLocaleString()} {t.tweetsWord}
               </>
             )}
           </div>

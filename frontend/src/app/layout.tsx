@@ -38,7 +38,7 @@ export default function RootLayout({
         {/* Prevent flash of wrong theme on load */}
         <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('theme');var d=window.matchMedia('(prefers-color-scheme:dark)').matches;if(t==='dark'||(t===null&&d)){document.documentElement.classList.add('dark')}else if(t==='light'){document.documentElement.classList.add('light')}}catch(e){}})();` }} />
       </head>
-      <body className="h-full flex overflow-hidden" style={{ background: "var(--background)" }}>
+      <body className="h-full flex flex-col md:flex-row overflow-hidden" style={{ background: "var(--background)" }}>
         <Sidebar />
         <div className="flex-1 min-w-0 overflow-y-auto scroll-y">
           {children}

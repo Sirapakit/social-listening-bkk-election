@@ -48,7 +48,8 @@ export function TopPosts({ result }: { result: KeywordResult }) {
                   <span className="ml-auto text-[10px] text-muted tabular shrink-0">
                     {formatNumber(p.author.followers)} {t.followersAbbr}
                   </span>
-                  <span
+                  {/* TODO: Hide chip until sentiment data is available */}
+                  {/* <span
                     className="text-[10px] font-semibold font-mono tracking-wider px-1.5 py-0.5 rounded shrink-0"
                     style={{
                       color: chip?.color,
@@ -56,7 +57,7 @@ export function TopPosts({ result }: { result: KeywordResult }) {
                     }}
                   >
                     {chip?.label}
-                  </span>
+                  </span> */}
                 </div>
                 <p className="text-sm leading-snug line-clamp-3 whitespace-pre-wrap">{p.text}</p>
                 <div className="mt-2 flex items-center gap-4 text-[11px] text-muted tabular">

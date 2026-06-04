@@ -18,7 +18,7 @@ export function SentimentDonut({ sentiment, label }: Props) {
   const posPct = total ? Math.round((sentiment.positive * 100) / total) : 0;
 
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex flex-col sm:flex-row sm:items-center gap-4">
       <div className="relative w-[120px] h-[120px] shrink-0">
         <ResponsiveContainer>
           <PieChart>
@@ -53,7 +53,7 @@ export function SentimentDonut({ sentiment, label }: Props) {
           <div className="text-[10px] uppercase tracking-wider text-muted">{t.sentLabel}</div>
         </div>
       </div>
-      <div className="flex flex-col gap-1.5 text-sm">
+      <div className="flex flex-col gap-1.5 text-sm min-w-0 w-full">
         <div className="text-[11px] uppercase tracking-wider text-muted mb-1">{label}</div>
         {data.map((d) => {
           const pct = total ? Math.round((d.value * 100) / total) : 0;

@@ -11,15 +11,14 @@ const navItems = [
 export function Sidebar() {
   return (
     <aside
-      className="flex flex-col items-center py-4 gap-1 shrink-0 h-screen sticky top-0 z-40"
+      className="flex flex-row md:flex-col items-center justify-between md:justify-start py-2 md:py-4 px-3 md:px-0 gap-2 shrink-0 w-full md:w-[var(--sidebar-w)] md:h-screen sticky top-0 z-40 border-b md:border-b-0 md:border-r"
       style={{
-        width: "var(--sidebar-w)",
         background: "var(--sidebar-bg)",
-        borderRight: "1px solid rgba(255,255,255,0.05)",
+        borderColor: "rgba(255,255,255,0.05)",
       }}
     >
       {/* Logo mark */}
-      <div className="w-8 h-8 mb-5 flex items-center justify-center">
+      <div className="w-8 h-8 md:mb-5 flex items-center justify-center shrink-0">
         <div
           className="w-6 h-6 rounded-sm"
           style={{ background: "var(--pos-dot)" }}
@@ -28,12 +27,12 @@ export function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex flex-col gap-0.5 w-full px-2">
+      <nav className="flex flex-row md:flex-col gap-1 md:gap-0.5 flex-1 md:flex-none w-auto md:w-full px-0 md:px-2 justify-center md:justify-start">
         {navItems.map(({ icon: Icon, label, active }) => (
           <button
             key={label}
             title={label}
-            className="w-full h-9 rounded-lg flex items-center justify-center transition-colors"
+            className="w-9 h-9 md:w-full md:h-9 rounded-lg flex items-center justify-center transition-colors"
             style={{
               color: active ? "var(--sidebar-icon-active)" : "var(--sidebar-icon)",
               background: active ? "var(--sidebar-icon-hover)" : "transparent",
@@ -45,12 +44,12 @@ export function Sidebar() {
       </nav>
 
       {/* Spacer */}
-      <div className="flex-1" />
+      <div className="hidden md:flex flex-1" />
 
       {/* Settings */}
       <button
         title="Settings"
-        className="w-9 h-9 rounded-lg flex items-center justify-center transition-colors mb-1"
+        className="hidden md:flex w-9 h-9 rounded-lg items-center justify-center transition-colors mb-1"
         style={{ color: "var(--sidebar-icon)" }}
       >
         <Settings className="w-4 h-4" strokeWidth={1.5} />
@@ -58,7 +57,7 @@ export function Sidebar() {
 
       {/* User avatar */}
       <div
-        className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold mb-1"
+        className="hidden md:flex w-7 h-7 rounded-full items-center justify-center text-[10px] font-bold mb-1"
         style={{ background: "var(--pos-2)", color: "#fff" }}
         title="User"
       >

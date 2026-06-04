@@ -41,6 +41,10 @@ function Sparkline({ data, color = "currentColor" }: { data: number[]; color?: s
   );
 }
 
+function buildDeterministicSeries(source: number[], transform: (value: number, index: number) => number) {
+  return source.map(transform);
+}
+
 // ── Aggregate KPI card ────────────────────────────────────────────────────────
 function KpiCard({
   label,
@@ -238,7 +242,7 @@ function DashboardInner() {
 
       {/* ─── Top nav ────────────────────────────────────────────────── */}
       <nav
-        className="sticky top-0 z-30 flex items-center gap-4 px-6 h-11 shrink-0"
+        className="sticky top-0 z-30 flex items-center gap-3 px-4 sm:px-6 h-11 shrink-0"
         style={{
           background: "var(--background)",
           borderBottom: "1px solid var(--border)",
@@ -263,7 +267,7 @@ function DashboardInner() {
           <span style={{ color: "var(--muted-2)" }}>ค้นหาคำสำคัญ, ข้อมูล...</span>
         </div>
 
-        <div className="ml-auto flex items-center gap-3">
+        <div className="ml-auto flex items-center gap-2 sm:gap-3">
           {/* Mock mode badge */}
           {IS_MOCK && (
             <span
@@ -310,14 +314,14 @@ function DashboardInner() {
       </nav>
 
       {/* ─── Page content ──────────────────────────────────────────────── */}
-      <main className="flex-1 px-6 lg:px-8 py-8 flex flex-col gap-6 max-w-[1400px] w-full mx-auto">
+      <main className="flex-1 px-4 sm:px-6 lg:px-8 py-6 md:py-8 flex flex-col gap-5 md:gap-6 max-w-[1400px] w-full mx-auto">
 
         {/* ─── Hero: title + meta ─────────────────────────────────────── */}
-        <section className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+        <section className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 md:gap-6">
           <div>
             <h1
               className="font-black leading-[0.92] tracking-tight"
-              style={{ fontSize: "clamp(52px, 7vw, 88px)", color: "var(--foreground)" }}
+              style={{ fontSize: "clamp(42px, 12vw, 88px)", color: "var(--foreground)" }}
             >
               Bangkok<br />Election<br />
               <span style={{ color: "var(--muted-2)" }}>2026</span>
@@ -332,7 +336,7 @@ function DashboardInner() {
 
           {/* Status panel */}
           <div
-            className="shrink-0 text-right space-y-3 pt-1"
+            className="shrink-0 text-left md:text-right space-y-3 pt-1"
             style={{ fontFamily: "var(--font-mono)" }}
           >
             <div>
@@ -373,7 +377,7 @@ function DashboardInner() {
         </section>
 
         {/* ─── Aggregate KPI cards ───────────────────────────────────── */}
-        <section className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
           <KpiCard
             label="TOTAL TWEETS"
             value={agg ? formatNumber(agg.totalTweets) : "—"}
@@ -386,7 +390,7 @@ function DashboardInner() {
             label="TOTAL REACH"
             value={agg ? formatNumber(agg.totalReach) : "—"}
             delta={agg ? "followers reached" : undefined}
-            sparkline={agg?.tweetSparkline.map((v) => v * 12)}
+            sparkline={agg ? buildDeterministicSeries(agg.tweetSparkline, (v) => v * 12) : undefined}
             deltaColor="var(--pos)"
             index={1}
           />
@@ -394,7 +398,7 @@ function DashboardInner() {
             label="POSITIVE SENTIMENT"
             value={agg ? `${agg.posPct}%` : "—"}
             delta={agg ? `${agg.negPct}% negative` : undefined}
-            sparkline={agg?.tweetSparkline.map((_, i) => agg.posPct + Math.sin(i) * 4)}
+            sparkline={agg ? buildDeterministicSeries(agg.tweetSparkline, (_, i) => agg.posPct + ((i % 5) - 2) * 1.5) : undefined}
             deltaColor={
               agg && agg.posPct > agg.negPct ? "var(--pos)" : "var(--neg)"
             }
@@ -404,7 +408,7 @@ function DashboardInner() {
             label="DATA COVERAGE"
             value={agg ? `${agg.coveragePct}%` : "—"}
             delta={agg && missingDayCount > 0 ? `${missingDayCount} days missing` : agg ? "complete" : undefined}
-            sparkline={agg?.tweetSparkline.map(() => agg.coveragePct + Math.random() * 5)}
+            sparkline={agg ? buildDeterministicSeries(agg.tweetSparkline, (_, i) => agg.coveragePct + (i % 3) * 0.75) : undefined}
             deltaColor={
               agg && agg.coveragePct >= 80 ? "var(--pos)"
               : agg && agg.coveragePct >= 50 ? "var(--neu)"
@@ -417,7 +421,7 @@ function DashboardInner() {
         {/* ─── Alerts ─────────────────────────────────────────────────── */}
         {showToast && (
           <div
-            className="card flex items-center gap-3 p-3 px-4 text-sm slide-in"
+            className="card flex flex-col sm:flex-row sm:items-center gap-3 p-3 px-4 text-sm slide-in"
             style={{ borderColor: "color-mix(in oklab, var(--neu) 35%, var(--border))" }}
           >
             <Sparkles className="w-4 h-4 shrink-0 pulse-soft" style={{ color: "var(--neu)" }} />
@@ -428,7 +432,7 @@ function DashboardInner() {
             </div>
             <button
               onClick={onBackfill}
-              className="btn-primary px-3 py-1.5 rounded-md text-xs font-semibold"
+              className="btn-primary px-3 py-1.5 rounded-md text-xs font-semibold w-full sm:w-auto"
             >
               {t.backfillNow}
             </button>
@@ -444,7 +448,7 @@ function DashboardInner() {
 
         {error && (
           <div
-            className="card p-4 flex items-start gap-3 slide-in"
+            className="card p-4 flex flex-col sm:flex-row sm:items-start gap-3 slide-in"
             style={{ borderColor: "color-mix(in oklab, var(--neg) 40%, var(--border))" }}
           >
             <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" style={{ color: "var(--neg)" }} />
@@ -454,8 +458,7 @@ function DashboardInner() {
                 {error}
               </div>
               <div className="text-xs mt-2" style={{ color: "var(--muted)" }}>
-                {t.errorTip}{" "}
-                <code className="font-mono" style={{ color: "var(--foreground)" }}>localhost:8000</code>
+                {t.errorTip} Check that the backend URL is reachable.
               </div>
             </div>
             <button
@@ -481,7 +484,7 @@ function DashboardInner() {
         )}
 
         {/* ─── Controls ───────────────────────────────────────────────── */}
-        {ready ? (
+        {/* {ready ? (
           <section>
             <div className="slash-label mb-3">SCRAPE CONTROLS</div>
             <ControlsBar
@@ -504,7 +507,7 @@ function DashboardInner() {
           </section>
         ) : (
           <div className="card shimmer h-[280px]" />
-        )}
+        )} */}
 
         {/* ─── Coverage grid ──────────────────────────────────────────── */}
         {data && ready && (
@@ -546,7 +549,7 @@ function DashboardInner() {
             {/* Keyword panels */}
             <section>
               <div className="slash-label mb-3">KEYWORD ANALYSIS</div>
-              <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
                 {data.results.map((r, i) => (
                   <div key={r.keyword} className="slide-in" style={{ animationDelay: `${i * 70}ms` }}>
                     <KeywordPanel result={r} />

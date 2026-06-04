@@ -3,10 +3,10 @@ services:
     build:
       context: ./backend
     ports:
-      - "8000:8000"
+      - "${BACKEND_HOST_PORT:-8001}:8000"
     environment:
       - APIFY_API_TOKEN=${APIFY_API_TOKEN:-}
-      - READONLY_MODE=${READONLY_MODE:-false}
+      - READONLY_MODE=true
       - MAX_TWEETS_PER_KEYWORD=${MAX_TWEETS_PER_KEYWORD:-2000}
       - DEFAULT_START_DATE=${DEFAULT_START_DATE:-2026-05-01}
       - PRICE_PER_TWEET_USD=${PRICE_PER_TWEET_USD:-0.00025}
@@ -24,9 +24,9 @@ services:
       args:
         # Browser makes API calls directly to this URL — must be reachable
         # from the end user's machine, not from inside Docker.
-        # For local deployments: http://localhost:8000 (default)
-        # For remote servers:   http://<your-server-ip>:8000
-        NEXT_PUBLIC_BACKEND_URL: ${NEXT_PUBLIC_BACKEND_URL:-http://localhost:8000}
+        # Frontend now proxies /api/* through Next.js rewrites.
+        NEXT_PUBLIC_BACKEND_URL: ${NEXT_PUBLIC_BACKEND_URL:-}
+        BACKEND_INTERNAL_URL: ${BACKEND_INTERNAL_URL:-http://backend:8000}
     ports:
       # Host port is overridable (default 3000). Set FRONTEND_PORT to avoid
       # collisions with other local containers, e.g. FRONTEND_PORT=3001.
