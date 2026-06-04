@@ -33,6 +33,7 @@ export default function RootLayout({
     <html
       lang="th"
       className={`${geistSans.variable} ${jetbrainsMono.variable} ${notoThai.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
       <head>
         {/* Prevent flash of wrong theme on load */}
