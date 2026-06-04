@@ -40,4 +40,9 @@ CANDIDATE_PRESETS: dict[str, dict] = {
         "color": "#F26B2C",  # orange accent
         "query": '"ดร.โจ" OR "ชัยวัฒน์ สถาวรวิจิตร" OR @ChaiwatPublic OR #ดรโจ',
     },
+    "khontamngan": {
+        "label": "สก.คนทำงาน",
+        "color": "#7C3AED",  # purple
+        "query": '"คนทำงาน" OR #คนทำงาน',
+    },
 }

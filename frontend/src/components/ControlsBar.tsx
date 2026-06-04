@@ -58,7 +58,7 @@ export function ControlsBar(props: Props) {
   return (
     <div className="card p-5 flex flex-col gap-5 slide-in">
       {/* Keywords row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
         {keywords.map((k, i) => (
           <div key={k.key} className="flex flex-col gap-1.5">
             <label className="text-[11px] uppercase tracking-wider text-muted font-medium flex items-center gap-2">
